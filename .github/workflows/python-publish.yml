@@ -49,14 +49,12 @@ jobs:
   publish-to-pypi:
     name: >-
       Publish LiveApex to PyPI
-    needs:
-    - release-build
+    needs: release-build
     runs-on: ubuntu-latest
     environment:
-      name: pypi
+      name: test-pypi
       url: https://test.pypi.org/legacy/
     permissions:
-      # IMPORTANT: this permission is mandatory for trusted publishing
       id-token: write
 
     steps:
