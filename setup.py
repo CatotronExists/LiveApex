@@ -20,8 +20,8 @@ setup(
     keywords='apex legends, live api, python, library',
     classifiers=[
         'Development Status :: Alpha',
-        'Intended Audience :: Developers',
         'Programming Language :: Python :: 3',
         'Operating System :: Microsoft :: Windows',
-    ]
+    ],
+    python_requires='>=3.6'
 )
