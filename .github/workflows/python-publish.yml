@@ -71,5 +71,3 @@ jobs:
         with:
           user: __token__
           password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-          verbose: true
-            
