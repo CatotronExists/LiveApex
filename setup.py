@@ -19,7 +19,7 @@ setup(
 
     keywords='apex legends, live api, python, library',
     classifiers=[
-        'Development Status :: Alpha',
+        'Development Status :: 3 - Alpha',
         'Programming Language :: Python :: 3',
         'Operating System :: Microsoft :: Windows',
     ],
