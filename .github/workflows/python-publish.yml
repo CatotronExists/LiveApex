@@ -53,7 +53,7 @@ jobs:
     runs-on: windows-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/liveapex
+      url: https://test.pypi.org/p/liveapex
     permissions:
       # IMPORTANT: this permission is mandatory for trusted publishing
       id-token: write
