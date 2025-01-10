@@ -9,9 +9,9 @@
 name: LiveApex
 
 on:
-  release:
+  push:
     branches:
-    - main
+    - dev
 
 permissions:
   contents: read
