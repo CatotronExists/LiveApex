@@ -47,8 +47,7 @@ jobs:
           path: dist/
 
   publish-to-pypi:
-    name: >-
-      Publish LiveApex to PyPI
+    name: Publish LiveApex to PyPI
     needs: release-build
     runs-on: ubuntu-latest
     environment:
