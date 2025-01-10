@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   release-build:
-    runs-on: linux-latest
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
