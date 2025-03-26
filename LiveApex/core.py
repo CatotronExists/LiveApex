@@ -1,30 +1,32 @@
-import json
 import asyncio
 import websockets
+import os
+import site
 
 from google.protobuf.any_pb2 import Any
 from google.protobuf import symbol_database
 from google.protobuf.json_format import MessageToDict
-import events_pb2
-
-with open('websocket.json', 'r') as f:
-    websocket_data = json.load(f)
+from . import events_pb2
 
 ### LiveApex Core Functions ###
 # These functions are essential for the LiveApex library to work #
 
 class LiveApexCore:
-    async def startLiveAPI():
-        # Due to issues for now run server.py then run tests/your programs
+    async def startLiveAPI(websocket_data: dict):
+        # Convert websocket_data
+        websocket_data_converted = f"{websocket_data['host']},{websocket_data['port']}"
+
+        # Get server.py path
+        server_path = os.path.join(site.getsitepackages()[0], "Lib", "site-packages", "LiveApex", "server.py")
 
         # start server subprocess
         process = await asyncio.create_subprocess_exec(
-            "python", "server.py",
+            "python", server_path, websocket_data_converted,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE
         )
 
-        print("[LiveApexCore] Started WebSocket server")
+        print("[LiveApexCore] Starting WebSocket server")
 
         async def read_stream(stream, callback):
             while True:
@@ -42,83 +44,80 @@ class LiveApexCore:
         # Ensure the tasks are cancelled and the streams are closed
         stdout_task.cancel()
         stderr_task.cancel()
-        await process.stdout.close()
-        await process.stderr.close()
+
+        try:
+            try:
+                await stdout_task
+                await stderr_task
+            except asyncio.CancelledError as e:
+                print("[LiveApexCore] error: ", e)
+                pass
+        except Exception as e:
+            print("[LiveApexCore] error: ", e)
+            pass
 
         print("[LiveApexCore] WebSocket server process ended")
 
-    async def startListener(callback):
+    async def startListener(callback, websocket_data: dict):
         async with websockets.connect(f"ws://{websocket_data['host']}:{websocket_data['port']}") as websocket:
-            print("[LiveApexCore] Started WebSocket listener")
+            print("[LiveApexCore] Started WebSocket listener\n")
             async for message in websocket:
                 decoded = LiveApexCore.decodeSocketEvent(message)
 
                 await callback(decoded)
         
     def decodeSocketEvent(event: Any):
-            """
-            # Decode a Socket Event
+        """
+        # Decode a Socket Event
 
-            This function decodes a socket event. Used to convert socket events to a `dict`.
+        This function decodes a socket event. Used to convert socket events to a `dict`.
 
-            ## Parameters
+        ## Parameters
 
-            :event: The event to decode.
+        :event: The event to decode.
 
-            ## Returns
+        ## Returns
 
-            The decoded event as `dict`.
+        The decoded event as `dict`.
 
-            ## Example
+        ## Example
 
-            ```python
-            decodeSocketEvent(event)
-            ```
-            """
+        ```python
+        decodeSocketEvent(event)
+        ```
+        """
 
-            try:
-                live_api_event = events_pb2.LiveAPIEvent()
-                live_api_event.ParseFromString(event)
+        try:
+            live_api_event = events_pb2.LiveAPIEvent()
+            live_api_event.ParseFromString(event)
 
-                print(f"live api event: {live_api_event}")
-                # Unpack the gameMessage field
-                game_message = Any()
-                game_message.CopyFrom(live_api_event.gameMessage)
+            #print(f"live api event: {live_api_event}")
+            # Unpack the gameMessage field
+            game_message = Any()
+            game_message.CopyFrom(live_api_event.gameMessage)
 
-                # Get the type of the contained message
-                result_type = game_message.TypeName()
-                print(f"result type: {result_type}")
-                
-                if result_type == "rtech.liveapi.Response":
-                    return None
-
-                msg_result = symbol_database.Default().GetSymbol(result_type)()
-                print(f"symbol: {symbol_database.Default().GetSymbol(result_type)()}")
-
-                game_message.Unpack(msg_result)
+            # Get the type of the contained message
+            result_type = game_message.TypeName()
+            #print(f"result type: {result_type}")
             
-            except Exception as e:
-                if 'Couldn\'t find message' in str(e): # Assume its a response. Fixes breaking after SendChat, maybe due to the response?
-                    try:
-                        live_api_event = events_pb2.Response()
-                        live_api_event.ParseFromString(event)
+            if result_type != "": # "" Filters messages that are sent to the server
+                if result_type != "rtech.liveapi.Response": # "rtech.liveapi.Response" Filters out responses (These are handled by other functions)
+                    msg_result = symbol_database.Default().GetSymbol(result_type)()
+                    #print(f"symbol: {symbol_database.Default().GetSymbol(result_type)()}")
 
-                        game_message = Any()
-                        game_message.CopyFrom(live_api_event.result)
+                    game_message.Unpack(msg_result)
 
-                        result_type = game_message.TypeName()
+                    # Turn the message into a dictionary
+                    result = MessageToDict(msg_result)
 
-                        msg_result = symbol_database.Default().GetSymbol(result_type)()
-
-                        game_message.Unpack(msg_result)
-
-                    except Exception as e:
-                        return {'Error': 'Unknown Error', 'Raw': event, 'Exception': str(e)}
-
+                    return result
+                
                 else:
-                    return {'Error': 'Unknown message type', 'Raw': event}
-
-            # Turn the message into a dictionary
-            result = MessageToDict(msg_result)
-
-            return result
+                    return None
+            
+            else:
+                return None
+        
+        except Exception as e:
+            print(f"[LiveApexCore] Error decoding socket event: {e}")
+            return None

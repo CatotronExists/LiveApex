@@ -4,6 +4,9 @@ map_translations = {
     "district_cm": "E-District",
     "moon_cm": "Broken Moon",
     "tdm_fragment_s_pm": "Fragment East",
+    "mp_rr_thunderdome": "Thunderdome",
+    
+
 }
 
 ability_translations = {
