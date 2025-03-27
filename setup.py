@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '0.1.4'
+version = '0.1.5'
 description = 'A Python library for interacting with the Apex Legends Live API.'
 long_description = 'A Python library for interacting with the Apex Legends Live API. Includes recieving game events and sending events to interact with the game.'
 
@@ -13,7 +13,7 @@ setup(
     long_description_content_type='text/markdown',
     packages=find_packages(),
     install_requires=[
-        'protobuf',
+        'protobuf==6.30.0',
         'websockets'
     ],
 
