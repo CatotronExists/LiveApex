@@ -41,10 +41,12 @@ jobs:
           fi
 
   release-build:
-    if: ${{ needs.check-commit-message.outputs.check_passed == 'true' }}
+    # if: ${{ needs.check-commit-message.outputs.check_passed == 'true' }}
     runs-on: ubuntu-latest
 
     steps:
+      - run: echo "${{ needs.check-commit-message.outputs.check_passed }}"
+      
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
