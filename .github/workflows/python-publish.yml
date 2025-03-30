@@ -22,6 +22,9 @@ jobs:
     name: Check commit message
     runs-on: ubuntu-latest
 
+    outputs:
+      check_passed: ${{ steps.check_version.outputs.check_passed }}
+
     steps:
       - name: Checkout 
         uses: actions/checkout@v4
@@ -31,14 +34,14 @@ jobs:
         run: |
           if [[ "$(git log -1 --pretty=%B)" =~ \[[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9]+)?\] ]]; then
             echo "Version tag found in commit message."
-            echo "check_passed=true"  >> $GITHUB_ENV
+            echo "check_passed=true" >> $GITHUB_OUTPUT
           else
             echo "No version tag found in commit message. Skipping publish."
-            echo "check_passed=false"  >> $GITHUB_ENV
+            echo "check_passed=false" >> $GITHUB_OUTPUT
           fi
 
   release-build:
-    if: ${{ github.env.check_passed == 'true' }}
+    if: ${{ needs.check-commit-message.outputs.check_passed == 'true' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -67,7 +70,7 @@ jobs:
           path: dist/
 
   publish-to-pypi:
-    if: ${{ github.env.check_passed == 'true' }}
+    if: ${{ needs.check-commit-message.outputs.check_passed == 'true' }}
     name: Publish LiveApex to PyPI
     needs: release-build
     runs-on: ubuntu-latest
