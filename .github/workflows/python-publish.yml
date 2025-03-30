@@ -81,6 +81,7 @@ jobs:
           path: dist/
 
       - name: pypi-publish
+        if: ${{ env.publish == 'true' }}
         uses: pypa/gh-action-pypi-publish@v1.12.3
         with:
           repository-url: https://test.pypi.org/legacy/
