@@ -28,14 +28,14 @@ jobs:
         run: |
           if [[ "$(git log -1 --pretty=%B)" =~ \[[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9]+)?\] ]]; then
             echo "Version tag found in commit message."
-            echo "publish=true" >> $GITHUB_ENV
+            echo "::set-output name=publish::true"
           else
             echo "No version tag found in commit message. Skipping publish."
-            echo "publish=false" >> $GITHUB_ENV
+            echo "::set-output name=publish::false"
           fi
 
   release-build:
-    if: ${{ env.publish == 'true' }}
+    if: ${{ needs.check-commit-message.outputs.publish }}
     runs-on: ubuntu-latest
 
     steps:
@@ -64,7 +64,7 @@ jobs:
           path: dist/
 
   publish-to-pypi:
-    if: ${{ env.publish == 'true' }}
+    if: ${{ needs.check-commit-message.outputs.publish }}
     name: Publish LiveApex to PyPI
     needs: release-build
     runs-on: ubuntu-latest
