@@ -37,6 +37,7 @@ jobs:
             echo "No version tag found in commit message. Skipping publish."
             echo "check_passed=false" >> $GITHUB_ENV
             echo "::set-output name=check_passed::false"
+          fi
 
     outputs:
       check_passed: ${{ steps.check_version.outputs.check_passed }}
