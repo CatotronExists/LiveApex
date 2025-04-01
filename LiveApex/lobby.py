@@ -15,14 +15,14 @@ errors = {
 
 }
 
-class LiveApexLobby:
+class Lobby:
     """
-    # LiveApex Lobby
+    # Lobby
 
-    This class contains functions for the LiveApex lobby.
+    This class contains functions to alter or get data on the lobby and it's players.
     """
 
-    async def setDropLocation(teamid: int, dropLocation: int, websocket_data: dict):
+    async def setDropLocation(self, teamid: int, dropLocation: int, websocket_data: dict):
         """
         # Set Drop Location
 
@@ -54,7 +54,7 @@ class LiveApexLobby:
             # Send the message
             await websocket.send(serialized_request)
 
-    async def sendChatMessage(text: str, websocket_data: dict):
+    async def sendChatMessage(self, text: str, websocket_data: dict):
         """
         # Send a Chat Message
 
@@ -94,7 +94,7 @@ class LiveApexLobby:
             response = MessageToDict(response)
             print(f"chat response: {response}")
     
-    async def customGetSettings(websocket_data: dict):
+    async def customGetSettings(self, websocket_data: dict):
         """
         # Get Custom Match Settings
 
@@ -120,7 +120,7 @@ class LiveApexLobby:
             # Send the message
             await websocket.send(serialized_request)
     
-    async def customGetPlayers(websocket_data: dict):
+    async def customGetPlayers(self, websocket_data: dict):
         """
         # Get Custom Match Players
 
@@ -146,7 +146,7 @@ class LiveApexLobby:
             # Send the message
             await websocket.send(serialized_request)
     
-    async def customSetTeamName(teamId: int, teamName: str, websocket_data: dict):
+    async def customSetTeamName(self, teamId: int, teamName: str, websocket_data: dict):
         """
         # Set Team Name
 
@@ -238,7 +238,7 @@ class LiveApexLobby:
                     else:
                         print(f"[LiveApexLobby] teamId {teamId} could not be set to '{teamName}'")
   
-    async def customKickPlayer(username, user_hash, websocket_data: dict):
+    async def customKickPlayer(self, username, user_hash, websocket_data: dict):
         """
         # Kick Player
 
@@ -269,7 +269,7 @@ class LiveApexLobby:
             # Send the message
             await websocket.send(serialized_request)
     
-    async def customMovePlayer(team_id, hardware_name, user_hash, websocket_data: dict):
+    async def customMovePlayer(self, team_id: int, hardware_name: str, user_hash: str, websocket_data: dict):
         """
         # Set Team
 
@@ -277,14 +277,14 @@ class LiveApexLobby:
 
         ## Parameters
 
-        :team_id: The ID of the team. team_id=1 is observer, team_id=2 is team 1 and so on.
+        :team_id: The ID of the team. team_id=0 is unassigned, team_id=1 is observer, team_id=2 is team 1 and so on.
         :hardware_name: The platform of the player, i.e PC-STEAM.
         :user_hash: The hash of the player. Obtained via LiveApexLobby.customGetPlayers().
 
         ## Example
 
         ```python
-        await LiveApexLobby.customMovePlayer(1, 'player', 'hash')
+        await LiveApex.LiveApexLobby.customMovePlayer(2, 'PC-STEAM', 'ad431d95fd8cdaf5e56f2b661cada2fb', 'websocket_data')
         ```
         """
             
@@ -304,7 +304,7 @@ class LiveApexLobby:
             # Send the message
             await websocket.send(serialized_request)
     
-    async def customTogglePause(websocket_data: dict):
+    async def customTogglePause(self, websocket_data: dict):
         """
         # Toggle Pause
 
@@ -330,7 +330,7 @@ class LiveApexLobby:
             # Send the message
             await websocket.send(serialized_request)
     
-    async def customCreateMatch(websocket_data: dict):
+    async def customCreateMatch(self, websocket_data: dict):
         """
         # Create Custom Match
 

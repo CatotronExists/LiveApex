@@ -11,8 +11,8 @@ from . import events_pb2
 ### LiveApex Core Functions ###
 # These functions are essential for the LiveApex library to work #
 
-class LiveApexCore:
-    async def startLiveAPI(websocket_data: dict):
+class Core:
+    async def startLiveAPI(self, websocket_data: dict):
         # Convert websocket_data
         websocket_data_converted = f"{websocket_data['host']},{websocket_data['port']}"
 
@@ -26,7 +26,7 @@ class LiveApexCore:
             stderr=asyncio.subprocess.PIPE
         )
 
-        print("[LiveApexCore] Starting WebSocket server")
+        print("[LiveApex Core] Starting WebSocket server")
 
         async def read_stream(stream, callback):
             while True:
@@ -58,15 +58,15 @@ class LiveApexCore:
 
         print("[LiveApexCore] WebSocket server process ended")
 
-    async def startListener(callback, websocket_data: dict):
+    async def startListener(self, callback, websocket_data: dict):
         async with websockets.connect(f"ws://{websocket_data['host']}:{websocket_data['port']}") as websocket:
             print("[LiveApexCore] Started WebSocket listener\n")
             async for message in websocket:
-                decoded = LiveApexCore.decodeSocketEvent(message)
+                decoded = Core.decodeSocketEvent(message)
 
                 await callback(decoded)
         
-    def decodeSocketEvent(event: Any):
+    def decodeSocketEvent(self, event: Any):
         """
         # Decode a Socket Event
 
