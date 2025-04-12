@@ -16,3 +16,12 @@ Python 3.6 or higher
 ### Installing Library
 ```pip install -i https://test.pypi.org/simple/ LiveApex```\
 ...and thats it!
+
+## Protobuf Generated File
+events_pb2.py (Located in LiveApex) is generated from protoc using the .proto file located in the Apex Legends LiveAPI directory.\
+`(steamapps/common/Apex Legends/LiveAPI/events.proto)`
+
+This file will be regenerated each time the LiveAPI is updated!
+
+## Versioning
+LiveApex version is v0.3.0. LiveAPI version is v2.3

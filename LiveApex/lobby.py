@@ -2,7 +2,7 @@ import websockets
 from google.protobuf.any_pb2 import Any
 from google.protobuf import symbol_database
 from google.protobuf.json_format import MessageToDict
-from . import events_pb2
+from . import events_pb2 
 
 # ERROR FORMAT
 # "Raw error message": "Raises: Reason"
@@ -11,8 +11,6 @@ errors = {
     "Not connected to a custom match and this request requires you to have created/joined a lobby. Send CustomMatch_CreateLobby or CustomMatch_JoinLobby first": "[LiveApexLobby] notInLobby: Not connected to a custom match",
     "Invalid team index": "[LiveApexLobby] invalidTeamIndex: Invalid team index, must be a value between 1 and 21 (Differs gamemode to gamemode)",
     "Team name is too long.": "[LiveApexLobby] teamNameTooLong: Team name is too long, must be equal to or less than 255 characters",
-
-
 }
 
 class Lobby:
@@ -22,31 +20,34 @@ class Lobby:
     This class contains functions to alter or get data on the lobby and it's players.
     """
 
-    async def setDropLocation(self, teamid: int, dropLocation: int, websocket_data: dict):
+    async def setDropLocation(team_id: int, drop_location: int, websocket_data: dict):
         """
         # Set Drop Location
 
-        This function sets the drop location of the lobby.
+        This function sets the drop location of a team.
 
         ## Parameters
 
-        :dropLocation: The drop location to set.
+        :team_id: The ID of the team. team_id=0 is unassigned, team_id=1 is observer, team_id=2 is team 1 and so on.
+        :drop_location: The POI ID of any POI (this is the same system as the @XX that can also be used to set drop locations).
+        :websocket_data: The websocket data. This is a dictionary containing the host and port of the websocket server.
 
         ## Example
 
         ```python
+        await LiveApex.Lobby.setDropLocation(2, 20, websocket_data)
+        ```
         """
 
         uri = f'ws://{websocket_data['host']}:{websocket_data['port']}'
         async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
             # Serialize the drop location
-            drop_location = events_pb2.CustomMatch_SetSpawnPoint(spawnPoint=dropLocation)
-            drop_location.SerializeToString()
+            set_location = events_pb2.CustomMatch_SetSpawnPoint(teamID=team_id, spawnPoint=drop_location)
+            set_location.SerializeToString()
 
             # Construct the Request message
             request = events_pb2.Request()
-            request.customMatch_SetSpawnPoint.CopyFrom(drop_location)
-            request.withAck = True
+            request.customMatch_SetSpawnPoint.CopyFrom(set_location)
 
             # Serialize the Request message
             serialized_request = request.SerializeToString()
@@ -54,7 +55,7 @@ class Lobby:
             # Send the message
             await websocket.send(serialized_request)
 
-    async def sendChatMessage(self, text: str, websocket_data: dict):
+    async def sendChatMessage(text: str, websocket_data: dict):
         """
         # Send a Chat Message
 
@@ -63,11 +64,12 @@ class Lobby:
         ## Parameters
 
         :text: The text of the chat message.
+        :websocket_data: The websocket data. This is a dictionary containing the host and port of the websocket server.
 
         ## Example
 
         ```python
-        await LiveApexLobby.sendChatMessage('Hello, World!')
+        await LiveApex.Lobby.sendChatMessage('Hello World!', websocket_data)
         ```
         """
 
@@ -80,30 +82,27 @@ class Lobby:
             # Construct the Request message
             request = events_pb2.Request()
             request.customMatch_SendChat.CopyFrom(chat_message)
-            request.withAck = True
 
             # Serialize the Request message
             serialized_request = request.SerializeToString()
             
             # Send the message
             await websocket.send(serialized_request)
-
-            received_response_raw = await websocket.recv()
-            response = events_pb2.Response()
-            response.ParseFromString(received_response_raw)
-            response = MessageToDict(response)
-            print(f"chat response: {response}")
     
-    async def customGetSettings(self, websocket_data: dict):
+    async def getSettings(websocket_data: dict): ## IDK, DOESNT WORK
         """
         # Get Custom Match Settings
 
         This function gets the custom match settings.
 
+        ## Parameters
+
+        :websocket_data: The websocket data. This is a dictionary containing the host and port of the websocket server.
+
         ## Example
         
         ```python
-        await LiveApexLobby.customGetSettings()
+        await LiveApex.Lobby.getSettings(websocket_data)
         ```
         """
 
@@ -120,16 +119,20 @@ class Lobby:
             # Send the message
             await websocket.send(serialized_request)
     
-    async def customGetPlayers(self, websocket_data: dict):
+    async def getPlayers(websocket_data: dict):
         """
         # Get Custom Match Players
 
         This function gets the custom match players.
 
+        ## Parameters
+
+        :websocket_data: The websocket data. This is a dictionary containing the host and port of the websocket server.
+
         ## Example
 
         ```python
-        await LiveApexLobby.customGetPlayers()
+        await LiveApex.Lobby.getPlayers(websocket_data)
         ```
         """
 
@@ -138,7 +141,6 @@ class Lobby:
             # Construct the Request message
             request = events_pb2.Request()
             request.customMatch_GetLobbyPlayers.CopyFrom(events_pb2.CustomMatch_GetLobbyPlayers())
-            request.withAck = True
 
             # Serialize the Request message
             serialized_request = request.SerializeToString()
@@ -146,7 +148,7 @@ class Lobby:
             # Send the message
             await websocket.send(serialized_request)
     
-    async def customSetTeamName(self, teamId: int, teamName: str, websocket_data: dict):
+    async def setTeamName(team_id: int, team_name: str, websocket_data: dict):
         """
         # Set Team Name
 
@@ -154,8 +156,9 @@ class Lobby:
 
         ## Parameters
 
-        `team_id` The ID of the team. (1 is observer, 2 is team 1, 3 is team 2, etc.)\n
-        `team_name` The name of the team.
+        :team_id: The ID of the team. team_id=0 is unassigned, team_id=1 is observer, team_id=2 is team 1 and so on.
+        :team_name: The name of the team.
+        :websocket_data: The websocket data. This is a dictionary containing the host and port of the websocket server.
 
         ## Notes
 
@@ -165,26 +168,23 @@ class Lobby:
 
         `notInLobby` - Not connected to a custom match.\n
         `notInGame` - Game client is not running Apex Legends or is not past the main menu.\n
-        `invalidTeamIndex` - Invalid team index, must be a value between 1 and 21 (Differs gamemode to gamemode).\n
+        `invalidTeamIndex` - Invalid team index, must be a value between 1 and 21 (Differs gamemode to gamemode).
 
         ## Example
 
         ```python
-        await LiveApexLobby.customSetTeamName(1, 'Awesome Team')
+        await LiveApex.Lobby.setTeamName(2, 'Awesome Team', websocket_data)
         ```
         """
 
         uri = f'ws://{websocket_data['host']}:{websocket_data['port']}'
         async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
-            teamname = events_pb2.CustomMatch_SetTeamName()
-            teamname.teamId = teamId
-            teamname.teamName = teamName
+            teamname = events_pb2.CustomMatch_SetTeamName(teanId=team_id, teamName=team_name)
             teamname.SerializeToString()
             
             # Construct the Request message
             request = events_pb2.Request()
             request.customMatch_SetTeamName.CopyFrom(teamname)
-            request.withAck = True
 
             # Serialize the Request message
             serialized_request = request.SerializeToString()
@@ -192,18 +192,7 @@ class Lobby:
             # Send the message
             await websocket.send(serialized_request)
 
-            # Await response and decode, first response is if the game received the message, second response is if the request was successful
-            received_response_raw = await websocket.recv()
-            response = events_pb2.Response()
-            response.ParseFromString(received_response_raw)
-            response = MessageToDict(response)
-            print(f"team name response: {response}")
 
-            if 'success' in response:
-                if response['success'] == True:
-                    print(f"[LiveApexLobby] Request recieved by game to set teamId {teamId} to '{teamName}'")
-                else:
-                    print(f"[LiveApexLobby] Request failed to set teamId {teamId} to '{teamName}'")
 
             # For Future Reference
             # I have no idea why but code from decodeSocketEvent() works perfectly fine for this
@@ -234,11 +223,11 @@ class Lobby:
                 
                 else:
                     if result['success'] == True:
-                        print(f"[LiveApexLobby] teamId {teamId} has been set to '{teamName}'")
+                        print(f"[LiveApexLobby] teamId {team_id} has been set to '{team_name}'")
                     else:
-                        print(f"[LiveApexLobby] teamId {teamId} could not be set to '{teamName}'")
+                        print(f"[LiveApexLobby] teamId {team_id} could not be set to '{team_name}'")
   
-    async def customKickPlayer(self, username, user_hash, websocket_data: dict):
+    async def kickPlayer(hardware_name: str, user_hash: str, websocket_data: dict):
         """
         # Kick Player
 
@@ -248,11 +237,12 @@ class Lobby:
 
         :username: The username of the player.
         :user_hash: The hash of the player.
+        :websocket_data: The websocket data. This is a dictionary containing the host and port of the websocket server.
 
         ## Example
 
         ```python
-        await LiveApexLobby.customKickPlayer('player', 'hash')
+        await LiveApex.Lobby.kickPlayer('PC-STEAM', 'ad431d95fd8cdaf5e56f2b661cada2fb', websocket_data)
         ```
         """
 
@@ -260,8 +250,7 @@ class Lobby:
         async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
             # Construct the Request message
             request = events_pb2.Request()
-            request.customMatch_KickPlayer.CopyFrom(events_pb2.CustomMatch_KickPlayer(username=username, userHash=user_hash))
-            request.withAck = True
+            request.customMatch_KickPlayer.CopyFrom(events_pb2.CustomMatch_KickPlayer(targetHardwareName=hardware_name, targetNucleusHash=user_hash))
 
             # Serialize the Request message
             serialized_request = request.SerializeToString()
@@ -269,7 +258,7 @@ class Lobby:
             # Send the message
             await websocket.send(serialized_request)
     
-    async def customMovePlayer(self, team_id: int, hardware_name: str, user_hash: str, websocket_data: dict):
+    async def movePlayer(team_id: int, hardware_name: str, user_hash: str, websocket_data: dict):
         """
         # Set Team
 
@@ -279,12 +268,12 @@ class Lobby:
 
         :team_id: The ID of the team. team_id=0 is unassigned, team_id=1 is observer, team_id=2 is team 1 and so on.
         :hardware_name: The platform of the player, i.e PC-STEAM.
-        :user_hash: The hash of the player. Obtained via LiveApexLobby.customGetPlayers().
+        :user_hash: The hash of the player. Obtained via LiveApex.Lobby.getPlayers().
 
         ## Example
 
         ```python
-        await LiveApex.LiveApexLobby.customMovePlayer(2, 'PC-STEAM', 'ad431d95fd8cdaf5e56f2b661cada2fb', 'websocket_data')
+        await LiveApex.Lobby.movePlayer(2, 'PC-STEAM', 'ad431d95fd8cdaf5e56f2b661cada2fb', 'websocket_data')
         ```
         """
             
@@ -296,7 +285,6 @@ class Lobby:
             # Construct the Request message
             request = events_pb2.Request()
             request.customMatch_SetTeam.CopyFrom(team)
-            request.withAck = True
 
             # Serialize the Request message
             serialized_request = request.SerializeToString()
@@ -304,7 +292,7 @@ class Lobby:
             # Send the message
             await websocket.send(serialized_request)
     
-    async def customTogglePause(self, websocket_data: dict):
+    async def togglePause(websocket_data: dict):
         """
         # Toggle Pause
 
@@ -313,7 +301,7 @@ class Lobby:
         ## Example
 
         ```python
-        await LiveApexLobby.customTogglePause()
+        await LiveApex.Lobby.togglePause(websocket_data)
         ```
         """
 
@@ -322,7 +310,6 @@ class Lobby:
             # Construct the Request message
             request = events_pb2.Request()
             request.customMatch_TogglePause.CopyFrom(events_pb2.CustomMatch_TogglePause())
-            request.withAck = True
 
             # Serialize the Request message
             serialized_request = request.SerializeToString()
@@ -330,7 +317,7 @@ class Lobby:
             # Send the message
             await websocket.send(serialized_request)
     
-    async def customCreateMatch(self, websocket_data: dict):
+    async def createMatch(websocket_data: dict):
         """
         # Create Custom Match
 
@@ -339,7 +326,7 @@ class Lobby:
         ## Example
 
         ```python
-        await LiveApexLobby.customCreateMatch()
+        await LiveApex.Lobby.createMatch()
         ```
         """
 
@@ -348,7 +335,6 @@ class Lobby:
             # Construct the Request message
             request = events_pb2.Request()
             request.customMatch_CreateMatch.CopyFrom(events_pb2.CustomMatch_CreateMatch())
-            request.withAck = True
 
             # Serialize the Request message
             serialized_request = request.SerializeToString()

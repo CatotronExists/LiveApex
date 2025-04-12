@@ -62,8 +62,8 @@ weapon_translations = {
     "mp_weapon_bow": "Bocek",
     # OTHER WEAPONS
     "mp_weapon_melee_survival": "Melee",
-    'mp_weapon_mounted_turret_weapon': "Sheila (Mobile)",
-    'mp_weapon_mounted_turret_placeable': "Sheila (Placed)"
+    'mp_weapon_mounted_turret_weapon': "Sheila (Placed)",
+    'mp_weapon_mounted_turret_placeable': "Sheila (Mobile)"
 }
 
 class Translator:
@@ -73,7 +73,7 @@ class Translator:
     This class contains functions to translate data from internal to common names.
     """
 
-    def translateAbility(self, ability: str):
+    def translateAbility(ability: str):
         """
         # Translate an Ability
 
@@ -86,11 +86,11 @@ class Translator:
         ## Example
 
         ```python
-        LiveApexTranslator.translateAbility('')
+        LiveApex.Translator.translateAbility('')
         ```
 
         ## Raises
-        
+
         Exception: {ability} | If the ability is unknown.
         """
 
@@ -100,8 +100,8 @@ class Translator:
             raise Exception(f"Unknown ability: {ability}")
 
         return translated
-    
-    def translateWeapon(self, weapon: str):
+
+    def translateWeapon(weapon: str):
         """
         # Translate a Weapon
 
@@ -129,7 +129,7 @@ class Translator:
 
         return translated
 
-    def translateMap(self, map: str):
+    def translateMap(map: str):
         """
         # Translate a Map
 
@@ -148,7 +148,6 @@ class Translator:
         ## Raises
 
         Exception: {map} | If the map is unknown.
-
         """
 
         if map in map_translations:
