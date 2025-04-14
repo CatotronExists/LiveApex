@@ -1,15 +1,19 @@
+### LiveApex Translator Functions ###
+# These functions convert internal to common names or vice versa #
+
+## Internal to Common Names
 map_translations = {
-    "mp_rr_canyonlands_hu": "Kings Canyon (Season 14)",
+    "mp_rr_canyonlands_hu": "Kings Canyon",
     "mp_rr_tropic_island_mu1": "Storm Point (Season 13)",
     "mp_rr_tropic_island_mu1_storm": "Storm Point (Season 18)",
-    "mp_rr_tropic_island_mu2": "Storm Point (Season 19)",
+    "mp_rr_tropic_island_mu2": "Storm Point",
     "mp_rr_desertlands_mu3": "Worlds Edge (Season 10)",
     "mp_rr_desertlands_mu4": "Worlds Edge (Season 16)",
-    "mp_rr_desertlands_hu": "Worlds Edge (Season 17)",
-    "mp_rr_olympus_mu2": "Olympus (Season 12)",
+    "mp_rr_desertlands_hu": "Worlds Edge",
+    "mp_rr_olympus_mu2": "Olympus",
     "mp_rr_divided_moon": "Broken Moon (Season 15)",
-    "mp_rr_divided_moon_mu1": "Broken Moon (Season 21)",
-    "mp_rr_district": "E-District (Season 22)",
+    "mp_rr_divided_moon_mu1": "Broken Moon",
+    "mp_rr_district": "E-District",
 }
 
 ability_translations = {
@@ -64,6 +68,75 @@ weapon_translations = {
     "mp_weapon_melee_survival": "Melee",
     'mp_weapon_mounted_turret_weapon': "Sheila (Placed)",
     'mp_weapon_mounted_turret_placeable': "Sheila (Mobile)"
+}
+
+## Common to Internal Names
+map_untranslations = {
+    "Kings Canyon": "mp_rr_canyonlands_hu",
+    "Storm Point (Season 13)": "mp_rr_tropic_island_mu1",
+    "Storm Point (Season 18)": "mp_rr_tropic_island_mu1_storm",
+    "Storm Point": "mp_rr_tropic_island_mu2",
+    "Worlds Edge (Season 10)": "mp_rr_desertlands_mu3",
+    "Worlds Edge (Season 16)": "mp_rr_desertlands_mu4",
+    "Worlds Edge": "mp_rr_desertlands_hu",
+    "Olympus": "mp_rr_olympus_mu2",
+    "Broken Moon (Season 15)": "mp_rr_divided_moon",
+    "Broken Moon": "mp_rr_divided_moon_mu1",
+    "E-District": "mp_rr_district"
+}
+
+ability_untranslations = {
+    "": "",
+    "": ""
+}
+
+# MISSING MELEE HEIRLOOM VARIANTS
+weapon_untranslations = {
+    # GRENADES
+    "Arc Star": "mp_weapon_grenade_emp",
+    "Thermite Grenade": "mp_weapon_thermite_grenade",
+    'Frag Grenade': 'mp_weapon_frag_grenade',
+    # AR WEAPONS
+    "Havoc": "mp_weapon_energy_ar",
+    "Flatline": "mp_weapon_vinson",
+    "Nemesis": "mp_weapon_nemesis",
+    "R-301": "mp_weapon_rspn101",
+    "Hemlok": "mp_weapon_hemlok",
+    # PISTOL WEAPONS
+    "P2020": "mp_weapon_semipistol",
+    "Wingman": "mp_weapon_wingman",
+    "RE-45": "mp_weapon_autopistol",
+    # LMG WEAPONS
+    "Rampage": "mp_weapon_dragon_lmg",
+    "Spitfire": "mp_weapon_lmg",
+    "Devotion": "mp_weapon_esaw",
+    "L-STAR": "mp_weapon_lstar",
+    # SMG WEAPONS
+    "Car": 'mp_weapon_car',
+    'R-99': 'mp_weapon_r97',
+    'Volt': 'mp_weapon_volt_smg',
+    'Prowler': 'mp_weapon_pdw',
+    'Alternator': 'mp_weapon_alternator_smg',
+    # SNIPER WEAPONS
+    'Longbow': 'mp_weapon_dmr',
+    'Charge Rifle': 'mp_weapon_defender',
+    'Sentinel': 'mp_weapon_sentinel',
+    # MARKSMAN WEAPONS
+    '30-30': 'mp_weapon_3030',
+    'G7 Scout': 'mp_weapon_g2',
+    'Triple Take': 'mp_weapon_doubletake',
+    # SHOTGUN WEAPONS
+    'Peacekeeper': 'mp_weapon_energy_shotgun',
+    'Mozambique Shotgun': 'mp_weapon_shotgun_pistol',
+    'EVA-8': 'mp_weapon_shotgun',
+    'Mastiff': 'mp_weapon_mastiff',
+    # CARE PACKAGE WEAPONS
+    'Kraber': 'mp_weapon_sniper',
+    'Bocek': 'mp_weapon_bow',
+    # OTHER WEAPONS
+    'Melee': 'mp_weapon_melee_survival',
+    'Sheila (Placed)': 'mp_weapon_mounted_turret_weapon',
+    'Sheila (Mobile)': 'mp_weapon_mounted_turret_placeable'
 }
 
 class Translator:
@@ -152,6 +225,89 @@ class Translator:
 
         if map in map_translations:
             translated = map_translations[map]
+        else:
+            raise Exception(f"Unknown map: {map}")
+
+        return translated
+
+    def untranslateAbility(ability: str):
+        """
+        # Untranslate an Ability
+
+        This function untranslates an ability from common name to internal reference.
+
+        ## Parameters
+
+        :ability: The ability to untranslate.
+
+        ## Example
+
+        ```python
+        LiveApex.Translator.untranslateAbility('')
+        ```
+
+        ## Raises
+
+        Exception: {ability} | If the ability is unknown.
+        """
+
+        if ability in ability_untranslations:
+            translated = ability_untranslations[ability]
+        else:
+            raise Exception(f"Unknown ability: {ability}")
+
+        return translated
+
+    def untranslateWeapon(weapon: str):
+        """
+        # Untranslate a Weapon
+
+        This function untranslates a weapon from common name to internal reference.
+
+        ## Parameters
+
+        :weapon: The weapon to untranslate.
+
+        ## Example
+
+        ```python
+        LiveApex.Translator.untranslateWeapon('Mastiff')
+        ```
+
+        ## Raises
+
+        Exception: {weapon} | If the weapon is unknown.
+        """
+
+        if weapon in weapon_untranslations:
+            translated = weapon_untranslations[weapon]
+        else:
+            raise Exception(f"Unknown weapon: {weapon}")
+
+        return translated
+
+    def untranslateMap(map: str):
+        """
+        # Untranslate a Map
+
+        This function untranslates a map from common name to internal reference.
+
+        ## Parameters
+
+        :map: The map to untranslate.
+
+        ## Example
+
+        ```python
+        LiveApex.Translator.untranslateMap('Kings Canyon')
+        ```
+
+        ## Raises
+        Exception: {map} | If the map is unknown.
+        """
+
+        if map in map_untranslations:
+            translated = map_untranslations[map]
         else:
             raise Exception(f"Unknown map: {map}")
 
