@@ -16,6 +16,19 @@ map_translations = {
     "mp_rr_district": "E-District",
 }
 
+datacenter_translations = {
+    "ap-east-1": "Hong Kong",
+    "ap-northeast-1": "Tokyo",
+    "ap-southeast-1": "Singapore",
+    "ap-southeast-2": "Sydney",
+    "eu-central-1": "Frankfurt",
+    "me-south-1": "Bahrain",
+    "sa-east-1": "Sao Paolo",
+    "us-east-1": "North Virginia",
+    "us-east-2": "Ohio",
+    "us-west-2": "Oregon",
+}
+
 ability_translations = {
     "": "",
     "": ""
@@ -83,6 +96,19 @@ map_untranslations = {
     "Broken Moon (Season 15)": "mp_rr_divided_moon",
     "Broken Moon": "mp_rr_divided_moon_mu1",
     "E-District": "mp_rr_district"
+}
+
+datacenter_untranslations = {
+    "Hong Kong": "ap-east-1",
+    "Tokyo": "ap-northeast-1",
+    "Singapore": "ap-southeast-1",
+    "Sydney": "ap-southeast-2",
+    "Frankfurt": "eu-central-1",
+    "Bahrain": "me-south-1",
+    "Sao Paolo": "sa-east-1",
+    "North Virginia": "us-east-1",
+    "Ohio": "us-east-2",
+    "Oregon": "us-west-2"
 }
 
 ability_untranslations = {
