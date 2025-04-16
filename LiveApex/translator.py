@@ -29,11 +29,6 @@ datacenter_translations = {
     "us-west-2": "Oregon",
 }
 
-ability_translations = {
-    "": "",
-    "": ""
-}
-
 ### MISSING MELEE HEIRLOOM VARIANTS
 weapon_translations = {
     # GRENADES
@@ -111,11 +106,6 @@ datacenter_untranslations = {
     "Oregon": "us-west-2"
 }
 
-ability_untranslations = {
-    "": "",
-    "": ""
-}
-
 # MISSING MELEE HEIRLOOM VARIANTS
 weapon_untranslations = {
     # GRENADES
@@ -172,31 +162,31 @@ class Translator:
     This class contains functions to translate data from internal to common names.
     """
 
-    def translateAbility(ability: str):
+    def translateDatacenter(datacenter: str):
         """
-        # Translate an Ability
+        # Translate a datacenter
 
-        This function translates an ability from internal reference to a common name.
+        This function translates a datacenter from internal reference to a common name.
 
         ## Parameters
 
-        :ability: The ability to translate.
+        :datacenter: The datacenter to translate.
 
         ## Example
 
         ```python
-        LiveApex.Translator.translateAbility('')
+        LiveApex.Translator.translateDatacenter('')
         ```
 
         ## Raises
 
-        Exception: {ability} | If the ability is unknown.
+        Exception: {datacenter} | If the datacenter is unknown.
         """
 
-        if ability in ability_translations:
-            translated = ability_translations[ability]
+        if datacenter in datacenter_translations:
+            translated = datacenter_translations[datacenter]
         else:
-            raise Exception(f"Unknown ability: {ability}")
+            raise Exception(f"Unknown datacenter: {datacenter}")
 
         return translated
 
@@ -256,31 +246,31 @@ class Translator:
 
         return translated
 
-    def untranslateAbility(ability: str):
+    def untranslateDatacenter(datacenter: str):
         """
-        # Untranslate an Ability
+        # Untranslate a datacenter
 
-        This function untranslates an ability from common name to internal reference.
+        This function untranslates a datacenter from common name to internal reference.
 
         ## Parameters
 
-        :ability: The ability to untranslate.
+        :datacenter: The datacenter to untranslate.
 
         ## Example
 
         ```python
-        LiveApex.Translator.untranslateAbility('')
+        LiveApex.Translator.untranslateDatacenter('')
         ```
 
         ## Raises
 
-        Exception: {ability} | If the ability is unknown.
+        Exception: {datacenter} | If the datacenter is unknown.
         """
 
-        if ability in ability_untranslations:
-            translated = ability_untranslations[ability]
+        if datacenter in datacenter_untranslations:
+            translated = datacenter_untranslations[datacenter]
         else:
-            raise Exception(f"Unknown ability: {ability}")
+            raise Exception(f"Unknown datacenter: {datacenter}")
 
         return translated
 
