@@ -114,36 +114,52 @@ class Core:
         """
 
         try:
-            # Parse the event
+            # Parse event
             live_api_event = events_pb2.LiveAPIEvent()
             live_api_event.ParseFromString(event)
 
-            # Unpack the gameMessage field
-            game_message = Any()
-            game_message.CopyFrom(live_api_event.gameMessage)
+            try:
+                result_type = live_api_event.gameMessage.TypeName()
 
-            # Get the type of the contained message
-            result_type = game_message.TypeName()
+                if result_type != "":
+                    if result_type == "rtech.liveapi.Response": # Response messages
+                        print(f"[LiveApexCore] Response message: {live_api_event}")
+                        msg_result = symbol_database.Default().GetSymbol(result_type)()
+                        live_api_event.gameMessage.Unpack(msg_result)
+                        result = MessageToDict(msg_result)
 
-            # Filter messages & return a dict result
-            if result_type != "": # "" Filters messages that are sent to the server
-                if result_type != "rtech.liveapi.Response": # "rtech.liveapi.Response" Filters out responses (These are handled by other functions)
-                    msg_result = symbol_database.Default().GetSymbol(result_type)()
-                    #print(msg_result)
+                        if result['success'] == True:
+                            if "CustomMatch_SetSettings" in result['result']['@type']: # if setting is False that setting is not sent
+                                playlistName = result['result']['playlistName']
+                                adminChat = result['result'].get('adminChat', False)
+                                selfAssign = result['result'].get('selfAssign', False)
+                                aimAssist = result['result'].get('aimAssist', False)
+                                anonMode = result['result'].get('anonMode', False)
+                                result = {
+                                    "playListName": playlistName,
+                                    "adminChat": adminChat,
+                                    "selfAssign": selfAssign,
+                                    "aimAssist": aimAssist,
+                                    "anonMode": anonMode,
+                                }
 
-                    game_message.Unpack(msg_result)
-                    result = MessageToDict(msg_result)
-                    return result
+                                return result
 
-                else: # Some responses are converted to gameEvents (i.e CustomMatch_GetSettings)
-                    #if 
-                    print(f"[LiveApexCore] Filtered out response message\n{event}")
+                    else: # LiveAPIEvents
+                        msg_result = symbol_database.Default().GetSymbol(result_type)()
+                        live_api_event.gameMessage.Unpack(msg_result)
+                        result = MessageToDict(msg_result)
+
+                        return result
+
+                else: # Assume sending to websocket
+                    #print(f"[LiveApexCore] Filtered out sent to websocket {live_api_event}")
                     return None
 
-            else:
-                print(f"[LiveApexCore] Sent to websocket:\n{event}")
+            except Exception as e:
+                print(f"[LiveApexCore] Error decoding socket event: {e}")
                 return None
 
         except Exception as e:
-            print(f"[LiveApexCore] Error decoding socket event: {e}")
+            print(f"[LiveApexCore] Error parsing event: {e}")
             return None
