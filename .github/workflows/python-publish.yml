@@ -28,6 +28,7 @@ jobs:
 
       - name: Check commit message for version tag
         id: check_version
+        # Commits require "[vX.Y.Z]" in the commit message to be published to pypi
         run: |
           if [[ "$(git log -1 --pretty=%B)" =~ \[[vV]?[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9]+)?\] ]]; then
             echo "Version tag found in commit message."
@@ -91,5 +92,3 @@ jobs:
         with:
           repository-url: https://test.pypi.org/legacy/
           verbose: true
-          # user: __token__
-          # password: ${{ secrets.TEST_PYPI_API_TOKEN }}
