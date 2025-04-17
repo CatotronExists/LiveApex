@@ -18,37 +18,30 @@ class Core:
     This class contains functions to start the WebSocket server and listener.
     """
 
-    async def startLiveAPI(websocket_data):
+    async def startLiveAPI():
         """
         # Start the LiveAPI WebSocket server
 
         This function starts the LiveAPI WebSocket server. It is used to connect to the game to send/receive events.
 
-        ## Parameters
-
-        :websocket_data: The websocket data to connect to the server.
-
         ## Example
 
         ```python
-        LiveApex.Core.startLiveAPI(websocket_data)
+        LiveApex.Core.startLiveAPI()
         ```
         """
-
-        # Convert websocket_data
-        websocket_data_converted = f"{websocket_data['host']},{websocket_data['port']}"
 
         # Get server.py path
         server_path = os.path.join(site.getsitepackages()[0], "Lib", "site-packages", "LiveApex", "server.py")
 
         # start server.py subprocess
         process = await asyncio.create_subprocess_exec(
-            "python", server_path, websocket_data_converted,
+            "python", server_path,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE
         )
 
-        print("[LiveApexCore] Starting WebSocket server")
+        print("[LiveApexCore] Starting WebSocket Server")
 
         # Read the output and error streams
         async def read_stream(stream, callback):
@@ -75,18 +68,18 @@ class Core:
                 await stdout_task
                 await stderr_task
             except asyncio.CancelledError as e:
-                print("[LiveApexCore] error: ", e)
+                print(f"[LiveApexCore] Error: {e}")
                 pass
         except Exception as e:
-            print("[LiveApexCore] error: ", e)
+            print(f"[LiveApexCore] Error: {e}")
             pass
 
-        print("[LiveApexCore] WebSocket server process ended")
+        print("[LiveApexCore] WebSocket Server Process Ended")
 
     # Define how websocket events are handled
-    async def startListener(callback, websocket_data: dict):
-        async with websockets.connect(f"ws://{websocket_data['host']}:{websocket_data['port']}") as websocket:
-            print("[LiveApexCore] Started WebSocket listener\n")
+    async def startListener(callback):
+        async with websockets.connect(f"ws://127.0.0.1:7777") as websocket:
+            print("[LiveApexCore] Started WebSocket Listener")
             async for message in websocket:
                 decoded = Core.decodeSocketEvent(message)
 
@@ -142,18 +135,15 @@ class Core:
                                     "aimAssist": aimAssist,
                                     "anonMode": anonMode,
                                 }
-
                                 return result
 
                     else: # LiveAPIEvents
                         msg_result = symbol_database.Default().GetSymbol(result_type)()
                         live_api_event.gameMessage.Unpack(msg_result)
                         result = MessageToDict(msg_result)
-
                         return result
 
                 else: # Assume sending to websocket
-                    #print(f"[LiveApexCore] Filtered out sent to websocket {live_api_event}")
                     return None
 
             except Exception as e:
