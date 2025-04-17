@@ -24,4 +24,4 @@ events_pb2.py (Located in LiveApex) is generated from protoc using the .proto fi
 This file will be regenerated each time the LiveAPI is updated!
 
 ## Versioning
-LiveApex version is v0.3.0. LiveAPI version is v2.3
+LiveApex version is v0.4.0. LiveAPI version is v2.3
