@@ -1,6 +1,9 @@
 import asyncio
 import websockets
 
+## LiveApex WebSocket Server ##
+# This starts the WebSocket server for the LiveApex library #
+
 connected_clients = set()
 
 async def echo(websocket, path):

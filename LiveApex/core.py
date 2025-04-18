@@ -114,9 +114,9 @@ class Core:
             try:
                 result_type = live_api_event.gameMessage.TypeName()
 
+                # Filters
                 if result_type != "":
                     if result_type == "rtech.liveapi.Response": # Response messages
-                        print(f"[LiveApexCore] Response message: {live_api_event}")
                         msg_result = symbol_database.Default().GetSymbol(result_type)()
                         live_api_event.gameMessage.Unpack(msg_result)
                         result = MessageToDict(msg_result)

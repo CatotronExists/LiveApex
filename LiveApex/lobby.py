@@ -1,6 +1,9 @@
 import websockets
 from . import events_pb2
 
+### LiveApex Lobby Functions ###
+# These functions are used to interact with the lobby and players in the custom match #
+
 class Lobby:
     """
     # Lobby
