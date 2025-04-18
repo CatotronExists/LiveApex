@@ -125,12 +125,14 @@ class Core:
                             if "CustomMatch_SetSettings" in result['result']['@type']: # if setting is False that setting is not sent
                                 playlistName = result['result']['playlistName']
                                 adminChat = result['result'].get('adminChat', False)
+                                teamRename = result['result'].get('teamRename', False)
                                 selfAssign = result['result'].get('selfAssign', False)
                                 aimAssist = result['result'].get('aimAssist', False)
                                 anonMode = result['result'].get('anonMode', False)
                                 result = {
                                     "playListName": playlistName,
                                     "adminChat": adminChat,
+                                    "teamRename": teamRename,
                                     "selfAssign": selfAssign,
                                     "aimAssist": aimAssist,
                                     "anonMode": anonMode,

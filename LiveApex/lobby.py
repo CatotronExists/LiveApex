@@ -341,12 +341,12 @@ class Lobby:
 
         ## Parameters
 
+        :playlist_name: The name of the playlist.
         :admin_chat: Whether to enable admin chat.
         :team_rename: Whether to enable team renaming.
         :self_assign: Whether to enable self assign.
         :aim_assist: Whether to enable aim assist.
         :anon_mode: Whether to enable anonymous mode.
-        :playlist_name: The name of the playlist.
 
         ## Example
 
