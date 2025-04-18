@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '0.4.0'
+version = '0.5.0'
 description = 'A Python library for interacting with the Apex Legends LiveAPI.'
 long_description = 'A Python library for interacting with the Apex Legends LiveAPI. Includes recieving game events and sending events to interact with the game.'
 
