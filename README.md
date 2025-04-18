@@ -18,7 +18,7 @@ Python 3.6 or higher
 ...and thats it!
 
 ## Docs
-All LiveAPIEvents, possible responses and fuctions are documented in the [wiki tab](https://github.com/CatotronExists/LiveApex/wiki)
+All LiveAPIEvents, possible responses and functions are documented in the [wiki tab](https://github.com/CatotronExists/LiveApex/wiki)
 
 ## Protobuf Generated File
 events_pb2.py (Located in LiveApex) is generated from protoc using the .proto file located in the Apex Legends LiveAPI directory.\
