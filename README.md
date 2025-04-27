@@ -21,7 +21,7 @@ The LiveAPI is only avaliable in custom games, this will not work for public or 
 Some functions will only work in HP lobbies (provided by EA/Respawn).
 
 ## Versioning
-LiveApex version is v0.5.0. LiveAPI version is v2.3\
+LiveApex version is v1.0.0. LiveAPI version is v2.3\
 This library will keep removed/deprecated functions for 2 seasons after they are removed from the LiveAPI. This is to allow for example data to not be outated as quickly.
 
 ## Disclaimer
