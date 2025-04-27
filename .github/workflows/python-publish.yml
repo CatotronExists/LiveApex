@@ -11,7 +11,7 @@ name: LiveApex
 on:
   push:
     branches:
-    - dev
+    - main
 
 permissions:
   contents: read
@@ -75,8 +75,8 @@ jobs:
     if: ${{ needs.check-commit-message.outputs.check_passed == 'true' }}
     runs-on: ubuntu-latest
     environment:
-      name: test-pypi
-      url: https://test.pypi.org/legacy/
+      name: pypi
+      url: https://upload.pypi.org/legacy/
     permissions:
       id-token: write
 
@@ -90,5 +90,5 @@ jobs:
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@v1.12.3
         with:
-          repository-url: https://test.pypi.org/legacy/
+          repository-url: https://upload.pypi.org/legacy/
           verbose: true
