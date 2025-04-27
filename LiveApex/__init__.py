@@ -1,3 +1,3 @@
-from core import LiveApexCore
-from lobby import LiveApexLobby
-from translator import LiveApexTranslator
+from .core import Core
+from .lobby import Lobby
+from .translator import Translator

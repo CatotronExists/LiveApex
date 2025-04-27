@@ -9,16 +9,45 @@
 name: LiveApex
 
 on:
-  release:
+  push:
     branches:
-    - main
+    - dev
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
+  check-commit-message:
+    name: Check commit message
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check commit message for version tag
+        id: check_version
+        # Commits require "[vX.Y.Z]" in the commit message to be published to pypi
+        run: |
+          if [[ "$(git log -1 --pretty=%B)" =~ \[[vV]?[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9]+)?\] ]]; then
+            echo "Version tag found in commit message."
+            echo "check_passed=true" >> $GITHUB_ENV
+            echo "::set-output name=check_passed::true"
+          else
+            echo "No version tag found in commit message. Skipping publish."
+            echo "check_passed=false" >> $GITHUB_ENV
+            echo "::set-output name=check_passed::false"
+          fi
+
+    outputs:
+      check_passed: ${{ steps.check_version.outputs.check_passed }}
+
   release-build:
-    runs-on: windows-latest
+    name: Build Release
+    needs: check-commit-message
+    if: ${{ needs.check-commit-message.outputs.check_passed == 'true' }}
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -30,14 +59,9 @@ jobs:
           python-version: "3.x"
 
       - name: Build release distributions
-        run: >-
-          python3 -m
-          pip install
-          build
-          --user
-
-      - name: Build Python 3
-        run: python3 -m build
+        run: |
+          python3 -m pip install build --user
+          python3 -m build
 
       - name: Store packages
         uses: actions/upload-artifact@v4
@@ -46,16 +70,14 @@ jobs:
           path: dist/
 
   publish-to-pypi:
-    name: >-
-      Publish LiveApex to PyPI
-    needs:
-    - release-build
-    runs-on: windows-latest
+    name: Publish to PyPI
+    needs: release-build
+    if: ${{ needs.check-commit-message.outputs.check_passed == 'true' }}
+    runs-on: ubuntu-latest
     environment:
-      name: pypi
-      url: https://pypi.org/p/liveapex
+      name: test-pypi
+      url: https://test.pypi.org/legacy/
     permissions:
-      # IMPORTANT: this permission is mandatory for trusted publishing
       id-token: write
 
     steps:
@@ -65,6 +87,8 @@ jobs:
           name: python-package-distributions
           path: dist/
 
-      - name: pypi-publish
+      - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@v1.12.3
-            
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          verbose: true
