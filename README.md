@@ -1,21 +1,11 @@
-# LiveApex Dev Branch
-Dev versions are unfinshed and untested
+
+# LiveApex 
+A Python library that handles the connection between a websocket and the game client
 
 ## Setup
-*Due to the Dev Branch being on TestPyPI each package has to be downloaded seperatly!*
+```pip install LiveApex```
 
-### Requirements
-Python 3.6 or higher
-
-### Installing Websockets
-```pip install websockets==12.0```
-
-### Installing Protobuf
-```pip install protobuf==6.30.1```
-
-### Installing Library
-```pip install -i https://test.pypi.org/simple/ LiveApex```\
-...and thats it!
+Requires Python 3.12 or higher
 
 ## Docs
 All LiveAPIEvents, possible responses and functions are documented in the [wiki tab](https://github.com/CatotronExists/LiveApex/wiki)
