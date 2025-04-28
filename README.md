@@ -1,4 +1,3 @@
-
 # LiveApex 
 A Python library that handles the connection between a websocket and the game client
 
@@ -6,6 +5,8 @@ A Python library that handles the connection between a websocket and the game cl
 ```pip install LiveApex```
 
 Requires Python 3.12 or higher
+
+Include ```+cl_liveapi_enabled 1``` in your steam launch options
 
 ## Docs
 All LiveAPIEvents, possible responses and functions are documented in the [wiki tab](https://github.com/CatotronExists/LiveApex/wiki)
