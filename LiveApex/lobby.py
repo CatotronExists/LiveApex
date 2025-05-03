@@ -213,7 +213,7 @@ class Lobby:
         async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
             # Construct the Request message
             request = events_pb2.Request()
-            request.customMatch_SetTeamName.CopyFrom(events_pb2.CustomMatch_SetTeamName(teanId=team_id, teamName=team_name))
+            request.customMatch_SetTeamName.CopyFrom(events_pb2.CustomMatch_SetTeamName(teamId=team_id, teamName=team_name))
 
             # Serialize the Request message
             serialized_request = request.SerializeToString()
