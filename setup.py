@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '1.0.1'
+version = '1.1.0'
 description = 'A Python library for interacting with the Apex Legends LiveAPI.'
 long_description = 'A Python library for interacting with the Apex Legends LiveAPI. Includes recieving game events and sending events to interact with the game.'
 
@@ -23,5 +23,5 @@ setup(
         'Programming Language :: Python :: 3',
         'Operating System :: Microsoft :: Windows',
     ],
-    python_requires='>=3.6'
+    python_requires='>=3.12'
 )
