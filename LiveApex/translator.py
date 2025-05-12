@@ -6,7 +6,8 @@ map_translations = {
     "mp_rr_canyonlands_hu": "Kings Canyon",
     "mp_rr_tropic_island_mu1": "Storm Point (Season 13)",
     "mp_rr_tropic_island_mu1_storm": "Storm Point (Season 18)",
-    "mp_rr_tropic_island_mu2": "Storm Point",
+    "mp_rr_tropic_island_mu2": "Storm Point (Season 21)",
+    "mp_rr_tropic_island_mu2_landscape": "Storm Point", # Season 25 optimization
     "mp_rr_desertlands_mu3": "Worlds Edge (Season 10)",
     "mp_rr_desertlands_mu4": "Worlds Edge (Season 16)",
     "mp_rr_desertlands_hu": "Worlds Edge",
@@ -71,8 +72,8 @@ weapon_translations = {
     "mp_weapon_mastiff": "Mastiff",
     # CARE PACKAGE WEAPONS
     "mp_weapon_sniper": "Kraber",
-    "mp_weapon_bow": "Bocek",
     # OTHER WEAPONS
+    "mp_weapon_bow": "Bocek",
     "mp_weapon_melee_survival": "Melee",
     'mp_weapon_mounted_turret_weapon': "Sheila (Placed)",
     'mp_weapon_mounted_turret_placeable': "Sheila (Mobile)"
@@ -83,7 +84,8 @@ map_untranslations = {
     "Kings Canyon": "mp_rr_canyonlands_hu",
     "Storm Point (Season 13)": "mp_rr_tropic_island_mu1",
     "Storm Point (Season 18)": "mp_rr_tropic_island_mu1_storm",
-    "Storm Point": "mp_rr_tropic_island_mu2",
+    "Storm Point (Season 21)": "mp_rr_tropic_island_mu2",
+    "Storm Point": "mp_rr_tropic_island_mu2_landscape", # Season 25 optimization
     "Worlds Edge (Season 10)": "mp_rr_desertlands_mu3",
     "Worlds Edge (Season 16)": "mp_rr_desertlands_mu4",
     "Worlds Edge": "mp_rr_desertlands_hu",
@@ -148,8 +150,8 @@ weapon_untranslations = {
     'Mastiff': 'mp_weapon_mastiff',
     # CARE PACKAGE WEAPONS
     'Kraber': 'mp_weapon_sniper',
-    'Bocek': 'mp_weapon_bow',
     # OTHER WEAPONS
+    'Bocek': 'mp_weapon_bow',
     'Melee': 'mp_weapon_melee_survival',
     'Sheila (Placed)': 'mp_weapon_mounted_turret_weapon',
     'Sheila (Mobile)': 'mp_weapon_mounted_turret_placeable'

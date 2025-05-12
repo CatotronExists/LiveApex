@@ -522,7 +522,7 @@ class Lobby:
             # Send the message
             await websocket.send(serialized_request)
 
-    async def changeCamera(selection: str):
+    async def changeCamera(selection: str, input: str):
         """
         # Change Camera
 
@@ -530,7 +530,8 @@ class Lobby:
 
         ## Parameters
 
-        :selection: Player name or cycle to NEXT or PREVIOUS teammate or KILL_LEADER, CLOSEST_ENEMY, CLOSEST_PLAYER, LATEST_ATTACKER.
+        :selection: Player name, nucleusHash or use one of the following poi options: NEXT, PREVIOUS, KILL_LEADER, CLOSEST_ENEMY, CLOSEST_PLAYER, LATEST_ATTACKER.
+        :input: poi, player or hash.
 
         ## Example
 
@@ -540,31 +541,37 @@ class Lobby:
         """
 
         uri = 'ws://127.0.0.1:7777'
-        if selection in ["NEXT", "PREVIOUS", "KILL_LEADER", "CLOSEST_ENEMY", "CLOSEST_PLAYER", "LATEST_ATTACKER"]:
-            async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
-                # Construct the Request message
-                request = events_pb2.Request()
-                if selection == "NEXT":
-                    request.changeCamera.poi = events_pb2.PlayerOfInterest.NEXT
-                elif selection == "PREVIOUS":
-                    request.changeCamera.poi = events_pb2.PlayerOfInterest.PREVIOUS
-                elif selection == "KILL_LEADER":
-                    request.changeCamera.poi = events_pb2.PlayerOfInterest.KILL_LEADER
-                elif selection == "CLOSEST_ENEMY":
-                    request.changeCamera.poi = events_pb2.PlayerOfInterest.CLOSEST_ENEMY
-                elif selection == "CLOSEST_PLAYER":
-                    request.changeCamera.poi = events_pb2.PlayerOfInterest.CLOSEST_PLAYER
-                elif selection == "LATEST_ATTACKER":
-                    request.changeCamera.poi = events_pb2.PlayerOfInterest.LATEST_ATTACKER
 
-        else:
-            async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
-                # Construct the Request message
-                request = events_pb2.Request()
-                request.changeCamera.CopyFrom(events_pb2.ChangeCamera(playerName=selection))
+        async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
+            # Construct the Request message
+            request = events_pb2.Request()
+            if input == "poi":
+                if selection in ["NEXT", "PREVIOUS", "KILL_LEADER", "CLOSEST_ENEMY", "CLOSEST_PLAYER", "LATEST_ATTACKER"]:
+                    if selection == "NEXT":
+                        request.changeCamera.poi = events_pb2.PlayerOfInterest.NEXT
+                    elif selection == "PREVIOUS":
+                        request.changeCamera.poi = events_pb2.PlayerOfInterest.PREVIOUS
+                    elif selection == "KILL_LEADER":
+                        request.changeCamera.poi = events_pb2.PlayerOfInterest.KILL_LEADER
+                    elif selection == "CLOSEST_ENEMY":
+                        request.changeCamera.poi = events_pb2.PlayerOfInterest.CLOSEST_ENEMY
+                    elif selection == "CLOSEST_PLAYER":
+                        request.changeCamera.poi = events_pb2.PlayerOfInterest.CLOSEST_PLAYER
+                    elif selection == "LATEST_ATTACKER":
+                        request.changeCamera.poi = events_pb2.PlayerOfInterest.LATEST_ATTACKER
 
-                # Serialize the Request message
-                serialized_request = request.SerializeToString()
+            elif input == "player":
+                request.changeCamera.name = selection
 
-                # Send the message
-                await websocket.send(serialized_request)
+            elif input == "hash":
+                request.changeCamera.nucleusHash = selection
+
+            # Construct the Request message
+            request = events_pb2.Request()
+            request.changeCamera.CopyFrom(events_pb2.ChangeCamera(target=selection))
+
+            # Serialize the Request message
+            serialized_request = request.SerializeToString()
+
+            # Send the message
+            await websocket.send(serialized_request)
