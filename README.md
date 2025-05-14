@@ -6,7 +6,7 @@ A Python library that handles the connection between a websocket and the game cl
 
 Requires Python 3.12 or higher
 
-Include ```+cl_liveapi_enabled 1``` in your steam launch options
+Include ```+cl_liveapi_enabled 1``` & ```+cl_liveapi_ws_servers "ws://127.0.0.1:7777"``` in your steam launch options
 
 ## Docs
 All LiveAPIEvents, possible responses and functions are documented in the [wiki tab](https://github.com/CatotronExists/LiveApex/wiki)
