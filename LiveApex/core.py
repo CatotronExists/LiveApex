@@ -80,7 +80,11 @@ class Core:
     async def startListener(callback):
         async with websockets.connect(f"ws://127.0.0.1:7777") as websocket:
             print("[LiveApexCore] Started WebSocket Listener")
+            previous_message = None
             async for message in websocket:
+                if message == previous_message: # TEMP PATCH: Ignore duplicate messages (Recent patch seems to have broken the LiveAPI, so each event is sent twice)
+                    continue
+                previous_message = message
                 decoded = Core.decodeSocketEvent(message)
 
                 await callback(decoded)

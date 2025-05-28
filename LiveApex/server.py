@@ -22,7 +22,7 @@ async def echo(websocket, path):
 
 async def main():
     try:
-        async with websockets.serve(echo, '127.0.0.1', '7777', open_timeout=None):
+        async with websockets.serve(echo, '127.0.0.1', '7777', open_timeout=None, ping_timeout=None):
             print(f"WebSocket server started on ws://127.0.0.1:7777")
             await asyncio.Future() # Run forever
     except OSError as e: # Another websocket instance is already running
