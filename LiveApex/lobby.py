@@ -1,5 +1,5 @@
 import websockets
-from . import events_pb2
+import json
 
 ### LiveApex Lobby Functions ###
 # These functions are used to interact with the lobby and players in the custom match #
@@ -11,19 +11,20 @@ class Lobby:
     This class contains functions to alter or get data on the lobby and it's players.
     """
 
-    async def sendChatMessage(text: str):
+    async def sendChatMessage(text):
         """
         # Send a Chat Message
 
-        This function sends a chat message to the lobby.
+        Send a chat message to the pre-game lobby.
 
         ## Parameters
 
-        :text: The text of the chat message.
+        :text: (any) The text of the chat message.
 
         ## Notes
 
         :sendChatMessage: has a rate limit of ~10 messages in quick succession, any messages after this limit will be ignored by the game.
+        Only works while in lobby, Apex ignores this request during games.
 
         ## Example
 
@@ -32,27 +33,18 @@ class Lobby:
         ```
         """
 
-        uri = 'ws://127.0.0.1:7777'
-        async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
-            # Construct the Request message
-            request = events_pb2.Request()
-            request.customMatch_SendChat.CopyFrom(events_pb2.CustomMatch_SendChat(text=text))
+        async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
+            await websocket.send(json.dumps({"customMatch_SendChat": {"text": str(text)}}))
 
-            # Serialize the Request message
-            serialized_request = request.SerializeToString()
-
-            # Send the message
-            await websocket.send(serialized_request)
-
-    async def togglePause(countdown: int):
+    async def togglePause(countdown):
         """
         # Toggle Pause
 
-        This function toggles the pause state of the custom match.
+        Toggle the pause state of the in-progress custom match.
 
         ## Parameters
 
-        :countdown: The countdown until the match is paused/unpaused. If set to 0, the match pause state will change instantly.
+        :countdown: (int) The countdown until the match is paused/unpaused. If set to 0, the match pause state will change instantly.
 
         ## Example
 
@@ -61,23 +53,18 @@ class Lobby:
         ```
         """
 
-        uri = 'ws://127.0.0.1:7777'
-        async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
-            # Construct the Request message
-            request = events_pb2.Request()
-            request.customMatch_TogglePause.CopyFrom(events_pb2.CustomMatch_TogglePause(preTimer=countdown))
+        if isinstance(countdown, int):
+            async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
+                await websocket.send(json.dumps({"customMatch_TogglePause": {"preTimer": str(countdown)}}))
 
-            # Serialize the Request message
-            serialized_request = request.SerializeToString()
-
-            # Send the message
-            await websocket.send(serialized_request)
+        else:
+            raise ValueError(f"[customMatch_TogglePause] countdown expects int value")
 
     async def createLobby():
         """
         # Create Lobby
 
-        This function creates a custom match lobby.
+        Create a custom match lobby, these lobbies have player requirements to start.
 
         ## Example
 
@@ -86,52 +73,38 @@ class Lobby:
         ```
         """
 
-        uri = 'ws://127.0.0.1:7777'
-        async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
-            # Construct the Request message
-            request = events_pb2.Request()
-            request.customMatch_CreateLobby.CopyFrom(events_pb2.CustomMatch_CreateLobby())
+        async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
+            await websocket.send(json.dumps({"customMatch_CreateLobby": {}}))
 
-            # Serialize the Request message
-            serialized_request = request.SerializeToString()
-
-            # Send the message
-            await websocket.send(serialized_request)
-
-    async def joinLobby(lobby_code: str):
+    async def joinLobby(lobby_code):
         """
         # Join Lobby
 
-        This function joins a custom match lobby.
+        Send request to join a custom match lobby with specified code.
 
         ## Parameters
 
-        :lobby_code: The lobby code to join (either admin or player code works).
+        :lobby_code: (str) The lobby code to join (either admin or player code).
 
         ## Example
 
         ```python
-        await LiveApex.Lobby.joinLobby(abcd1234)
+        await LiveApex.Lobby.joinLobby('abcd1234')
         ```
         """
 
-        uri = 'ws://127.0.0.1:7777'
-        async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
-            # Construct the Request message
-            request = events_pb2.Request()
-            request.customMatch_JoinLobby.CopyFrom(events_pb2.CustomMatch_JoinLobby(roleToken=lobby_code))
+        if isinstance(lobby_code, str):
+            async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
+                await websocket.send(json.dumps({"customMatch_JoinLobby": {"roleToken": lobby_code}}))
 
-            # Serialize the Request message
-            serialized_request = request.SerializeToString()
-
-            # Send the message
-            await websocket.send(serialized_request)
+        else:
+            raise ValueError(f"[customMatch_JoinLobby] lobby_code expects str value")
 
     async def leaveLobby():
         """
         # Leave Lobby
 
-        This function leaves a custom match lobby.
+        Request to leave current custom match lobby.
 
         ## Example
 
@@ -140,27 +113,18 @@ class Lobby:
         ```
         """
 
-        uri = 'ws://127.0.0.1:7777'
-        async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
-            # Construct the Request message
-            request = events_pb2.Request()
-            request.customMatch_LeaveLobby.CopyFrom(events_pb2.CustomMatch_LeaveLobby())
+        async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
+            await websocket.send(json.dumps({"customMatch_LeaveLobby": {}}))
 
-            # Serialize the Request message
-            serialized_request = request.SerializeToString()
-
-            # Send the message
-            await websocket.send(serialized_request)
-
-    async def setReady(ready: bool):
+    async def setReady(ready):
         """
         # Set Ready
 
-        This function sets the ready state of the player.
+        Change ready state of client
 
         ## Parameters
 
-        :ready: The ready state of the player.
+        :ready: (bool) The ready state of the client.
 
         ## Example
 
@@ -169,38 +133,27 @@ class Lobby:
         ```
         """
 
-        uri = 'ws://127.0.0.1:7777'
-        async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
-            # Construct the Request message
-            request = events_pb2.Request()
-            request.customMatch_SetReady.CopyFrom(events_pb2.CustomMatch_SetReady(isReady=ready))
+        if isinstance(ready, bool):
+            async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
+                await websocket.send(json.dumps({"customMatch_SetReady": {"isReady": ready}}))
 
-            # Serialize the Request message
-            serialized_request = request.SerializeToString()
+        else:
+            raise ValueError(f"[customMatch_SetReady] ready expects bool value")
 
-            # Send the message
-            await websocket.send(serialized_request)
-
-    async def setTeamName(team_id: int, team_name: str):
+    async def setTeamName(team_id, team_name):
         """
         # Set Team Name
 
-        This function sets the name of a team.
+        Sets the name of a requested team.
 
         ## Parameters
 
-        :team_id: The ID of the team. team_id=0 is unassigned, team_id=1 is observer, team_id=2 is team 1 and so on.
-        :team_name: The name of the team.
+        :team_id: (int) The ID of the team. team_id=0 is unassigned, team_id=1 is observer, team_id=2 is team 1 and so on.
+        :team_name: (str) The name of the team.
 
         ## Notes
 
         Team names can only be set when using lobby codes from EA/Respawn.
-
-        ## Raises
-
-        `notInLobby` - Not connected to a custom match.\n
-        `notInGame` - Game client is not running Apex Legends or is not past the main menu.\n
-        `invalidTeamIndex` - Invalid team index, must be a value between 1 and 21 (Differs gamemode to gamemode).
 
         ## Example
 
@@ -209,23 +162,18 @@ class Lobby:
         ```
         """
 
-        uri = 'ws://127.0.0.1:7777'
-        async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
-            # Construct the Request message
-            request = events_pb2.Request()
-            request.customMatch_SetTeamName.CopyFrom(events_pb2.CustomMatch_SetTeamName(teamId=team_id, teamName=team_name))
+        if isinstance(team_id, int) and isinstance(team_name, str):
+            async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
+                await websocket.send(json.dumps({"customMatch_SetTeamName": {"teamId": team_id, "teamName": team_name}}))
 
-            # Serialize the Request message
-            serialized_request = request.SerializeToString()
-
-            # Send the message
-            await websocket.send(serialized_request)
+        else:
+            raise ValueError(f"[customMatch_SetTeamName] One or more of the following values are invaild:\n   [customMatch_SetTeamName] team_id expects int value\n   [customMatch_SetTeamName] team_name expects str value")
 
     async def getPlayers():
         """
         # Get Custom Match Players
 
-        This function gets the custom match players.
+        Requests data for all custom match players.
 
         ## Example
 
@@ -234,29 +182,20 @@ class Lobby:
         ```
         """
 
-        uri = 'ws://127.0.0.1:7777'
-        async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
-            # Construct the Request message
-            request = events_pb2.Request()
-            request.customMatch_GetLobbyPlayers.CopyFrom(events_pb2.CustomMatch_GetLobbyPlayers())
+        async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
+            await websocket.send(json.dumps({"customMatch_GetLobbyPlayers": {}}))
 
-            # Serialize the Request message
-            serialized_request = request.SerializeToString()
-
-            # Send the message
-            await websocket.send(serialized_request)
-
-    async def movePlayer(team_id: int, hardware_name: str, user_hash: str):
+    async def movePlayer(team_id, hardware_name, user_hash):
         """
         # Set Team
 
-        This function moves a player to a different team.
+        Move a player to a different team.
 
         ## Parameters
 
-        :team_id: The ID of the team. team_id=0 is unassigned, team_id=1 is observer, team_id=2 is team 1 and so on.
-        :hardware_name: The platform of the player, i.e PC-STEAM.
-        :user_hash: The hash of the player. Obtained via LiveApex.Lobby.getPlayers().
+        :team_id: (int) The ID of the team. team_id=0 is unassigned, team_id=1 is observer, team_id=2 is team 1 and so on.
+        :hardware_name: (str) The platform of the player, i.e PC-STEAM.
+        :user_hash: (str) The hash of the player. Obtained via LiveApex.Lobby.getPlayers().
 
         ## Example
 
@@ -265,28 +204,23 @@ class Lobby:
         ```
         """
 
-        uri = 'ws://127.0.0.1:7777'
-        async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
-            # Construct the Request message
-            request = events_pb2.Request()
-            request.customMatch_SetTeam.CopyFrom(events_pb2.CustomMatch_SetTeam(teamId=team_id, targetHardwareName=hardware_name, targetNucleusHash=user_hash))
+        if isinstance(team_id, int) and isinstance(hardware_name, str) and isinstance(user_hash, str):
+            async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
+                await websocket.send(json.dumps({"customMatch_SetTeam": {"teamId": team_id, "targetHardwareName": hardware_name, "targetNucleusHash": user_hash}}))
 
-            # Serialize the Request message
-            serialized_request = request.SerializeToString()
+        else:
+            raise ValueError(f"[customMatch_SetTeam] One or more of the following values are invaild:\n   [customMatch_SetTeam] team_id expects int value\n   [customMatch_SetTeam] hardware_name expects str value\n   [customMatch_SetTeam] user_hash expects str value")
 
-            # Send the message
-            await websocket.send(serialized_request)
-
-    async def kickPlayer(hardware_name: str, user_hash: str):
+    async def kickPlayer(hardware_name, user_hash):
         """
         # Kick Player
 
-        This function kicks a player from the custom match.
+        Kick a player from the custom match.
 
         ## Parameters
 
-        :hardware_name: The platform of the player, i.e PC-STEAM.
-        :user_hash: The hash of the player.
+        :hardware_name: (str) The platform of the player, i.e PC-STEAM.
+        :user_hash: (str) The hash of the player.
 
         ## Example
 
@@ -295,23 +229,18 @@ class Lobby:
         ```
         """
 
-        uri = 'ws://127.0.0.1:7777'
-        async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
-            # Construct the Request message
-            request = events_pb2.Request()
-            request.customMatch_KickPlayer.CopyFrom(events_pb2.CustomMatch_KickPlayer(targetHardwareName=hardware_name, targetNucleusHash=user_hash))
+        if isinstance(hardware_name, str) and isinstance(user_hash, str):
+            async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
+                await websocket.send(json.dumps({"customMatch_KickPlayer": {"targetHardwareName": hardware_name, "targetNucleusHash": user_hash}}))
 
-            # Serialize the Request message
-            serialized_request = request.SerializeToString()
-
-            # Send the message
-            await websocket.send(serialized_request)
+        else:
+            raise ValueError(f"[customMatch_KickPlayer] One or more of the following values are invaild:\n   [customMatch_KickPlayer] hardware_name expects str value\n   [customMatch_KickPlayer] user_hash expects str value")
 
     async def getSettings():
         """
         # Get Custom Match Settings
 
-        This function gets the custom match settings.
+        Gets current custom match settings.
 
         ## Example
 
@@ -320,33 +249,27 @@ class Lobby:
         ```
         """
 
-        uri = 'ws://127.0.0.1:7777'
-        async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
-            # Construct the Request message
-            request = events_pb2.Request()
-            request.customMatch_GetSettings.CopyFrom(events_pb2.CustomMatch_GetSettings())
-            request.withAck = True
+        async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
+            await websocket.send(json.dumps({"customMatch_GetSettings": {}}))
 
-            # Serialize the Request message
-            serialized_request = request.SerializeToString()
-
-            # Send the message
-            await websocket.send(serialized_request)
-
-    async def setSettings(playlist_name: str, admin_chat: bool, team_rename: bool, self_assign: bool, aim_assist: bool, anon_mode: bool):
+    async def setSettings(playlist_name, admin_chat, team_rename, self_assign, aim_assist, anon_mode):
         """
         # Set Custom Match Settings
 
-        This function sets the custom match settings.
+        Set custom match settings.
 
         ## Parameters
 
-        :playlist_name: The name of the playlist.
-        :admin_chat: Whether to enable admin chat.
-        :team_rename: Whether to enable team renaming.
-        :self_assign: Whether to enable self assign.
-        :aim_assist: Whether to enable aim assist.
-        :anon_mode: Whether to enable anonymous mode.
+        :playlist_name: (str) The name of the playlist.
+        :admin_chat: (bool) Enable/Disable admin chat.
+        :team_rename: (bool) Enable/Disable team renaming.
+        :self_assign: (bool) Enable/Disable self assign.
+        :aim_assist: (bool) Enable/Disable aim assist.
+        :anon_mode: (bool) Enable/Disable anonymous mode.
+
+        ## Notes
+
+        All parameters need to be supplied each time setSettings() is used.
 
         ## Example
 
@@ -355,27 +278,22 @@ class Lobby:
         ```
         """
 
-        uri = 'ws://127.0.0.1:7777'
-        async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
-            # Construct the Request message
-            request = events_pb2.Request()
-            request.customMatch_SetSettings.CopyFrom(events_pb2.CustomMatch_SetSettings(playlistName=playlist_name, adminChat=admin_chat, teamRename=team_rename, selfAssign=self_assign, aimAssist=aim_assist, anonMode=anon_mode))
+        if isinstance(playlist_name, str) and isinstance(admin_chat, bool) and isinstance(team_rename, bool) and isinstance(self_assign, bool) and isinstance(aim_assist, bool) and isinstance(anon_mode, bool):
+            async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
+                await websocket.send(json.dumps({"customMatch_SetSettings": {"playlistName": playlist_name, "adminChat": admin_chat, "teamRename": team_rename, "selfAssign": self_assign, "aimAssist": aim_assist, "anonMode": anon_mode}}))
 
-            # Serialize the Request message
-            serialized_request = request.SerializeToString()
+        else:
+            raise ValueError(f"[customMatch_SetSettings] One or more of the following values are invaild:\n   [customMatch_SetSettings] playlist_name expects str value\n   [customMatch_SetSettings] admin_chat expects bool value\n   [customMatch_SetSettings] team_rename expects bool value\n   [customMatch_SetSettings] self_assign expects bool value\n   [customMatch_SetSettings] aim_assist expects bool value\n   [customMatch_SetSettings] anon_mode expects bool value")
 
-            # Send the message
-            await websocket.send(serialized_request)
-
-    async def setLegendBan(bans: list[str]):
+    async def setLegendBan(bans):
         """
         # Set Legend Ban
 
-        This function sets legend bans for the lobby. To reset the bans, run this function with an empty list.
+        Sets legend bans for the lobby. To reset the bans, run this function with an empty list.
 
         ## Parameters
 
-        :bans: A list of legend names to ban.
+        :bans: (list[str]) A list of legend names to ban, all list items must be str.
 
         ## Example
 
@@ -384,23 +302,26 @@ class Lobby:
         ```
         """
 
-        uri = 'ws://127.0.0.1:7777'
-        async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
-            # Construct the Request message
-            request = events_pb2.Request()
-            request.customMatch_SetLegendBan.CopyFrom(events_pb2.CustomMatch_SetLegendBan(legendRefs=bans))
+        scan = 0
+        if isinstance(bans, list):
+            for i in bans: # Check if each item is a str
+                if isinstance(i, str): pass
+                else: scan +=1
 
-            # Serialize the Request message
-            serialized_request = request.SerializeToString()
+            if scan == 0: # If all items are str -> send to websocket
+                async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
+                    await websocket.send(json.dumps({"customMatch_SetLegendBan": {"legendRefs": ''.join(bans)}}))
+            else:
+                raise ValueError(f"[customMatch_SetLegendBan] bans expects all list values to be str")
 
-            # Send the message
-            await websocket.send(serialized_request)
+        else:
+            raise ValueError(f"[customMatch_SetLegendBan] bans expects list value")
 
     async def getLegendBans():
         """
         # Get Legend Bans
 
-        This function gets the legend bans for the lobby.
+        Get a list of current legend bans.
 
         ## Example
 
@@ -409,27 +330,18 @@ class Lobby:
         ```
         """
 
-        uri = 'ws://127.0.0.1:7777'
-        async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
-            # Construct the Request message
-            request = events_pb2.Request()
-            request.customMatch_GetLegendBanStatus.CopyFrom(events_pb2.CustomMatch_GetLegendBanStatus())
+        async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
+            await websocket.send(json.dumps({"customMatch_GetLegendBanStatus": {}}))
 
-            # Serialize the Request message
-            serialized_request = request.SerializeToString()
-
-            # Send the message
-            await websocket.send(serialized_request)
-
-    async def startGame(status: bool):
+    async def startGame(status):
         """
         # Start Game
 
-        This function starts/stops custom match matchmaking.
+        Send request to start/stop custom match matchmaking.
 
         ## Parameters
 
-        :status: Whether to start or stop matchmaking.
+        :status: (bool) Start/stop matchmaking.
 
         ## Example
 
@@ -438,19 +350,14 @@ class Lobby:
         ```
         """
 
-        uri = 'ws://127.0.0.1:7777'
-        async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
-            # Construct the Request message
-            request = events_pb2.Request()
-            request.customMatch_SetMatchmaking.CopyFrom(events_pb2.CustomMatch_SetMatchmaking(enabled=status))
+        if isinstance(status, bool):
+            async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
+                await websocket.send(json.dumps({"customMatch_SetMatchmaking": {"enabled": status}}))
 
-            # Serialize the Request message
-            serialized_request = request.SerializeToString()
+        else:
+            raise ValueError(f"[customMatch_SetMatchmaking] status expects bool value")
 
-            # Send the message
-            await websocket.send(serialized_request)
-
-    async def setDropLocation(team_id: int, drop_location: int):
+    async def setDropLocation(team_id, drop_location):
         """
         # Set Drop Location
 
@@ -458,8 +365,8 @@ class Lobby:
 
         ## Parameters
 
-        :team_id: The ID of the team. team_id=0 is unassigned, team_id=1 is observer, team_id=2 is team 1 and so on.
-        :drop_location: The POI ID of any POI (this is the same system as the @XX that can also be used to set drop locations).
+        :team_id: (int) The ID of the team. team_id=0 is unassigned, team_id=1 is observer, team_id=2 is team 1 and so on.
+        :drop_location: (int) The POI ID of any POI (this is the same system as the @XX that can also be used to set drop locations).
 
         ## Example
 
@@ -468,110 +375,106 @@ class Lobby:
         ```
         """
 
-        uri = 'ws://127.0.0.1:7777'
-        async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
-            # Construct the Request message
-            request = events_pb2.Request()
-            request.customMatch_SetSpawnPoint.CopyFrom(events_pb2.CustomMatch_SetSpawnPoint(teamId=team_id, spawnPoint=drop_location))
+        if isinstance(team_id, int) and isinstance(drop_location, int):
+            async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
+                await websocket.send(json.dumps({"customMatch_SetSpawnPoint": {"teamId": team_id, "spawnPoint": drop_location}}))
 
-            # Serialize the Request message
-            serialized_request = request.SerializeToString()
+        else:
+            raise ValueError(f"[customMatch_SetSpawnPoint] One or more of the following values are invaild:\n   [customMatch_SetSpawnPoint] team_id expects int value\n   [customMatch_SetSpawnPoint] drop_location expects int value")
 
-            # Send the message
-            await websocket.send(serialized_request)
+    ### TEMP DISABLED
+    # async def setEndRingExclusions(map_region):
+    #     """
+    #     # Set End Ring Exclusions
 
-    async def setEndRingExclusions(map_region: str):
-        """
-        # Set End Ring Exclusions
+    #     This function sets the end ring exclusions for the lobby. Run this function multiple times if you want to exclude multiple regions.
 
-        This function sets the end ring exclusions for the lobby. Run this function multiple times if you want to exclude multiple regions.
+    #     ## Parameters
 
-        ## Parameters
+    #     :map_region: (str) The map region to exclude. TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT, CENTER or use REGIONS_COUNT to reset
 
-        :map_region: The map region to exclude. TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT, CENTER or REGIONS_COUNT to reset
+    #     ## Example
 
-        ## Example
+    #     ```python
+    #     await LiveApex.Lobby.setEndRingExclusions('TOP_LEFT')
+    #     ```
+    #     """
 
-        ```python
-        await LiveApex.Lobby.setEndRingExclusions('TOP_LEFT')
-        ```
-        """
+    #     uri = 'ws://127.0.0.1:7777'
+    #     async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
+    #         # Construct the Request message
+    #         request = events_pb2.Request()
+    #         if map_region == "TOP_LEFT":
+    #             request.customMatch_SetEndRingExclusion.selectionToExclude = events_pb2.MapRegion.TOP_LEFT
+    #         elif map_region == "TOP_RIGHT":
+    #             request.customMatch_SetEndRingExclusion.selectionToExclude = events_pb2.MapRegion.TOP_RIGHT
+    #         elif map_region == "BOTTOM_LEFT":
+    #             request.customMatch_SetEndRingExclusion.selectionToExclude = events_pb2.MapRegion.BOTTOM_LEFT
+    #         elif map_region == "BOTTOM_RIGHT":
+    #             request.customMatch_SetEndRingExclusion.selectionToExclude = events_pb2.MapRegion.BOTTOM_RIGHT
+    #         elif map_region == "CENTER":
+    #             request.customMatch_SetEndRingExclusion.selectionToExclude = events_pb2.MapRegion.CENTER
+    #         elif map_region == "REGIONS_COUNT":
+    #             request.customMatch_SetEndRingExclusion.selectionToExclude = events_pb2.MapRegion.REGIONS_COUNT
+    #         else:
+    #             raise ValueError("[LiveApexLobby] Invalid map region. Must be one of: TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT, CENTER or REGIONS_COUNT.")
 
-        uri = 'ws://127.0.0.1:7777'
-        async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
-            # Construct the Request message
-            request = events_pb2.Request()
-            if map_region == "TOP_LEFT":
-                request.customMatch_SetEndRingExclusion.selectionToExclude = events_pb2.MapRegion.TOP_LEFT
-            elif map_region == "TOP_RIGHT":
-                request.customMatch_SetEndRingExclusion.selectionToExclude = events_pb2.MapRegion.TOP_RIGHT
-            elif map_region == "BOTTOM_LEFT":
-                request.customMatch_SetEndRingExclusion.selectionToExclude = events_pb2.MapRegion.BOTTOM_LEFT
-            elif map_region == "BOTTOM_RIGHT":
-                request.customMatch_SetEndRingExclusion.selectionToExclude = events_pb2.MapRegion.BOTTOM_RIGHT
-            elif map_region == "CENTER":
-                request.customMatch_SetEndRingExclusion.selectionToExclude = events_pb2.MapRegion.CENTER
-            elif map_region == "REGIONS_COUNT":
-                request.customMatch_SetEndRingExclusion.selectionToExclude = events_pb2.MapRegion.REGIONS_COUNT
-            else:
-                raise ValueError("[LiveApexLobby] Invalid map region. Must be one of: TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT, CENTER or REGIONS_COUNT.")
+    #         # Serialize the Request message
+    #         serialized_request = request.SerializeToString()
 
-            # Serialize the Request message
-            serialized_request = request.SerializeToString()
+    #         # Send the message
+    #         await websocket.send(serialized_request)
 
-            # Send the message
-            await websocket.send(serialized_request)
+    # async def changeCamera(selection, input):
+    #     """
+    #     # Change Camera
 
-    async def changeCamera(selection: str, input: str):
-        """
-        # Change Camera
+    #     This function changes the camera of the observer.
 
-        This function changes the camera of the observer.
+    #     ## Parameters
 
-        ## Parameters
+    #     :selection: (str) Player name, nucleusHash or use one of the following poi options: NEXT, PREVIOUS, KILL_LEADER, CLOSEST_ENEMY, CLOSEST_PLAYER, LATEST_ATTACKER.
+    #     :input: (str) poi ["NEXT", "PREVIOUS", "KILL_LEADER", "CLOSEST_ENEMY", "CLOSEST_PLAYER", "LATEST_ATTACKER"], player or hash.
 
-        :selection: Player name, nucleusHash or use one of the following poi options: NEXT, PREVIOUS, KILL_LEADER, CLOSEST_ENEMY, CLOSEST_PLAYER, LATEST_ATTACKER.
-        :input: poi, player or hash.
+    #     ## Example
 
-        ## Example
+    #     ```python
+    #     await LiveApex.Lobby.changeCamera('KILL_LEADER')
+    #     ```
+    #     """
 
-        ```python
-        await LiveApex.Lobby.changeCamera('KILL_LEADER')
-        ```
-        """
+    #     uri = 'ws://127.0.0.1:7777'
 
-        uri = 'ws://127.0.0.1:7777'
+    #     async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
+    #         # Construct the Request message
+    #         request = events_pb2.Request()
+    #         if input == "poi":
+    #             if selection in ["NEXT", "PREVIOUS", "KILL_LEADER", "CLOSEST_ENEMY", "CLOSEST_PLAYER", "LATEST_ATTACKER"]:
+    #                 if selection == "NEXT":
+    #                     request.changeCamera.poi = events_pb2.PlayerOfInterest.NEXT
+    #                 elif selection == "PREVIOUS":
+    #                     request.changeCamera.poi = events_pb2.PlayerOfInterest.PREVIOUS
+    #                 elif selection == "KILL_LEADER":
+    #                     request.changeCamera.poi = events_pb2.PlayerOfInterest.KILL_LEADER
+    #                 elif selection == "CLOSEST_ENEMY":
+    #                     request.changeCamera.poi = events_pb2.PlayerOfInterest.CLOSEST_ENEMY
+    #                 elif selection == "CLOSEST_PLAYER":
+    #                     request.changeCamera.poi = events_pb2.PlayerOfInterest.CLOSEST_PLAYER
+    #                 elif selection == "LATEST_ATTACKER":
+    #                     request.changeCamera.poi = events_pb2.PlayerOfInterest.LATEST_ATTACKER
 
-        async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
-            # Construct the Request message
-            request = events_pb2.Request()
-            if input == "poi":
-                if selection in ["NEXT", "PREVIOUS", "KILL_LEADER", "CLOSEST_ENEMY", "CLOSEST_PLAYER", "LATEST_ATTACKER"]:
-                    if selection == "NEXT":
-                        request.changeCamera.poi = events_pb2.PlayerOfInterest.NEXT
-                    elif selection == "PREVIOUS":
-                        request.changeCamera.poi = events_pb2.PlayerOfInterest.PREVIOUS
-                    elif selection == "KILL_LEADER":
-                        request.changeCamera.poi = events_pb2.PlayerOfInterest.KILL_LEADER
-                    elif selection == "CLOSEST_ENEMY":
-                        request.changeCamera.poi = events_pb2.PlayerOfInterest.CLOSEST_ENEMY
-                    elif selection == "CLOSEST_PLAYER":
-                        request.changeCamera.poi = events_pb2.PlayerOfInterest.CLOSEST_PLAYER
-                    elif selection == "LATEST_ATTACKER":
-                        request.changeCamera.poi = events_pb2.PlayerOfInterest.LATEST_ATTACKER
+    #         elif input == "player":
+    #             request.changeCamera.name = selection
 
-            elif input == "player":
-                request.changeCamera.name = selection
+    #         elif input == "hash":
+    #             request.changeCamera.nucleusHash = selection
 
-            elif input == "hash":
-                request.changeCamera.nucleusHash = selection
+    #         # Construct the Request message
+    #         request = events_pb2.Request()
+    #         request.changeCamera.CopyFrom(events_pb2.ChangeCamera(target=selection))
 
-            # Construct the Request message
-            request = events_pb2.Request()
-            request.changeCamera.CopyFrom(events_pb2.ChangeCamera(target=selection))
+    #         # Serialize the Request message
+    #         serialized_request = request.SerializeToString()
 
-            # Serialize the Request message
-            serialized_request = request.SerializeToString()
-
-            # Send the message
-            await websocket.send(serialized_request)
+    #         # Send the message
+    #         await websocket.send(serialized_request)

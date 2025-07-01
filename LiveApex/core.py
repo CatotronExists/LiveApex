@@ -2,11 +2,8 @@ import asyncio
 import websockets
 import os
 import site
-
-from google.protobuf.any_pb2 import Any
-from google.protobuf import symbol_database
-from google.protobuf.json_format import MessageToDict
-from . import events_pb2
+import traceback
+import json
 
 ### LiveApex Core Functions ###
 # These functions are essential for the LiveApex library to work #
@@ -18,7 +15,7 @@ class Core:
     This class contains functions to start the WebSocket server and listener.
     """
 
-    async def startLiveAPI():
+    async def startLiveAPI(debug = False):
         """
         # Start the LiveAPI WebSocket server
 
@@ -52,8 +49,13 @@ class Core:
                 callback(line.decode().strip())
 
         # Define output and error streams
-        stdout_task = asyncio.create_task(read_stream(process.stdout, lambda x: print(f"[LiveApexSocket] {x}")))
-        stderr_task = asyncio.create_task(read_stream(process.stderr, lambda x: print(f"[LiveApexSocket] [ERROR] {x}")))
+        if debug == False:
+            stdout_task = asyncio.create_task(read_stream(process.stdout, lambda x: print(f"[LiveApexSocket] {x}")))
+            stderr_task = asyncio.create_task(read_stream(process.stderr, lambda x: print(f"[LiveApexSocket] [ERROR] {x}")))
+
+        elif debug == True:
+            stdout_task = asyncio.create_task(read_stream(process.stdout, lambda x: print(f"[LiveApexSocket] {x}\n===\nError Log\n{traceback.format_exc()}\n===")))
+            stderr_task = asyncio.create_task(read_stream(process.stderr, lambda x: print(f"[LiveApexSocket] [ERROR] {x}\n===\nError Log\n{traceback.format_exc()}\n===")))
 
         # Keep socket process running
         await process.wait()
@@ -68,10 +70,12 @@ class Core:
                 await stdout_task
                 await stderr_task
             except asyncio.CancelledError as e:
-                print(f"[LiveApexCore] Error: {e}")
+                if debug == False: print(f"[LiveApexCore] Error: {e}")
+                elif debug == True: print(f"[LiveApexCore] Error: {e}\n===\nError Log\n{traceback.format_exc()}\n===")
                 pass
         except Exception as e:
-            print(f"[LiveApexCore] Error: {e}")
+            if debug == False: print(f"[LiveApexCore] Error: {e}")
+            elif debug == True: print(f"[LiveApexCore] Error: {e}\n===\nError Log\n{traceback.format_exc()}\n===")
             pass
 
         print("[LiveApexCore] WebSocket Server Process Ended")
@@ -80,82 +84,6 @@ class Core:
     async def startListener(callback):
         async with websockets.connect(f"ws://127.0.0.1:7777") as websocket:
             print("[LiveApexCore] Started WebSocket Listener")
-            previous_message = None
             async for message in websocket:
-                if message == previous_message: # TEMP PATCH: Ignore duplicate messages (Recent patch seems to have broken the LiveAPI, so each event is sent twice)
-                    continue
-                previous_message = message
-                decoded = Core.decodeSocketEvent(message)
-
-                await callback(decoded)
-
-    def decodeSocketEvent(event: Any):
-        """
-        # Decode a Socket Event
-
-        This function decodes a socket event. Used to convert socket events to a `dict`.
-
-        ## Parameters
-
-        :event: The event to decode.
-
-        ## Returns
-
-        The decoded event as `dict`.
-
-        ## Example
-
-        ```python
-        decodeSocketEvent(event)
-        ```
-        """
-
-        try:
-            # Parse event
-            live_api_event = events_pb2.LiveAPIEvent()
-            live_api_event.ParseFromString(event)
-
-            try:
-                result_type = live_api_event.gameMessage.TypeName()
-
-                # Filters
-                if result_type != "":
-                    if result_type == "rtech.liveapi.Response": # Response messages
-                        msg_result = symbol_database.Default().GetSymbol(result_type)()
-                        live_api_event.gameMessage.Unpack(msg_result)
-                        result = MessageToDict(msg_result)
-
-                        if result['success'] == True:
-                            if "CustomMatch_SetSettings" in result['result']['@type']: # if setting is False that setting is not sent
-                                playlistName = result['result']['playlistName']
-                                adminChat = result['result'].get('adminChat', False)
-                                teamRename = result['result'].get('teamRename', False)
-                                selfAssign = result['result'].get('selfAssign', False)
-                                aimAssist = result['result'].get('aimAssist', False)
-                                anonMode = result['result'].get('anonMode', False)
-                                result = {
-                                    "playListName": playlistName,
-                                    "adminChat": adminChat,
-                                    "teamRename": teamRename,
-                                    "selfAssign": selfAssign,
-                                    "aimAssist": aimAssist,
-                                    "anonMode": anonMode,
-                                }
-                                return result
-
-                    else: # LiveAPIEvents
-                        msg_result = symbol_database.Default().GetSymbol(result_type)()
-                        live_api_event.gameMessage.Unpack(msg_result)
-                        result = MessageToDict(msg_result)
-                        return result
-
-                else: # Assume sending to websocket
-                    return None
-
-            except Exception as e:
-                print(f"[LiveApexCore] Error decoding socket event: {e}")
-                return None
-
-        except Exception as e:
-            print(f"[LiveApexCore] Error parsing event: {e}")
-            return None
+                message = json.loads(message)
+                await callback(message) # Convert to JSON, recieved as str
