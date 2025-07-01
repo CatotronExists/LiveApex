@@ -38,6 +38,16 @@ class Core:
             stderr=asyncio.subprocess.PIPE
         )
 
+        print(r"""
+ _     _              _
+| |   (_)_   _____   / \   _ __   _____  __
+| |   | \ \ / / _ \ / _ \ | '_ \ / _ \ \/ /
+| |___| |\ V /  __// ___ \| |_) |  __/>  <
+|_____|_| \_/ \___/_/   \_\ .__/ \___/_/\_\
+                            |_|
+===========================================
+Version 1.2.0 // 1/07/2025
+        """)
         print("[LiveApexCore] Starting WebSocket Server")
 
         # Read the output and error streams
