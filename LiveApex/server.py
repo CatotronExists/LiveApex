@@ -9,28 +9,27 @@ connected_clients = set()
 async def echo(websocket, path):
     connected_clients.add(websocket)
     try:
-        async for message in websocket:
-            # Broadcast the message to all connected clients
+        async for message in websocket: # Broadcast the message to all connected clients
             tasks = [asyncio.create_task(client.send(message)) for client in connected_clients]
             await asyncio.gather(*tasks)
 
-    except websockets.exceptions.ConnectionClosedOK:
+    except websockets.exceptions.ConnectionClosedOK: 
         pass
 
-    finally:
+    finally: 
         connected_clients.remove(websocket)
 
 async def main():
     try:
+        print("[LiveApexSocket] Starting WebSocket Server")
+
         async with websockets.serve(echo, '127.0.0.1', '7777', open_timeout=None, ping_timeout=None):
-            print(f"WebSocket server started on ws://127.0.0.1:7777")
+            print(f"[LiveApexSocket] WebSocket server started on ws://127.0.0.1:7777")
             await asyncio.Future() # Run forever
+
     except OSError as e: # Another websocket instance is already running
-        if '10048' in str(e):
+        if '10048' in str(e): 
             raise Exception("[LiveApexSocket] existingInstance: Another websocket instance is already running")
 
-        else:
+        else: 
             raise e
-
-if __name__ == "__main__":
-    asyncio.run(main())
