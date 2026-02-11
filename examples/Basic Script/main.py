@@ -17,7 +17,7 @@ async def filter_events(event):
 async def main():
     # Start the API
     api_task = asyncio.create_task(LiveApex.Core.startLiveAPI())
-    listener_task = asyncio.create_task(LiveApex.Core.startListener(filter_events))
+    listener_task = asyncio.create_task(LiveApex.Core.startListener(filter_events, method = "Protobuf"))
 
     await asyncio.gather(api_task, listener_task)
 
