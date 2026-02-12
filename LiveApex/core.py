@@ -23,7 +23,7 @@ class Core:
         """
         # Start the LiveAPI WebSocket server
 
-        This function starts the LiveAPI WebSocket server. It is used to connect to the game to send/receive events.
+        Start a WebSocket server. It is used to connect to the Apex LiveAPI to send/receive events.
 
         ## Example
 
@@ -34,7 +34,7 @@ class Core:
 
         # Import LiveApex.server
         try: websocket_server = importlib.import_module("LiveApex.server")
-    
+
         except Exception as e:
             if debug: print(f"[LiveApexCore] Failed to import server module: {e}\n===\nError Log\n{traceback.format_exc()}\n===")
             else: print(f"[LiveApexCore] Failed to import server module: {e}")
@@ -63,11 +63,11 @@ class Core:
         """
         # Start the LiveAPI WebSocket server
 
-        This function starts the LiveAPI WebSocket server. It is used to connect to the game to send/receive events.
-        
+        Establish a callback on all recieved game events.
+
         ## Parameters
 
-        :callback: (function) A function that takes a single parameter. All decoded WebSocket messages will be fowarded to this callback for handling. This is where you will handle all events from the game.
+        :callback: (function) A function that takes a single dict parameter. All decoded WebSocket messages will be fowarded to this callback for handling. This is where you will handle all events from the game.
         :method: (string) The method to decode WebSocket messages. Can be either "Protobuf" or "JSON". Default is "Protobuf". Ensure your launch options are set correctly for your choice.
 
         ## Example
@@ -89,7 +89,7 @@ class Core:
                 if decoded_message is not None:
                     if 'category' in decoded_message and decoded_message['category'] == 'init':
                         print("[LiveApexCore] Connection to Apex client established, LiveApex is ready")
-                
+
                 await callback(decoded_message)
 
     def decodeSocketEvent(event: Any):
