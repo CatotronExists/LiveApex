@@ -64,7 +64,7 @@ class Lobby:
         """
         # Create Lobby
 
-        Create a custom match lobby, these lobbies have player requirements to start.
+        Creates a 'free' custom match lobby, these lobbies have player requirements to start.
 
         ## Example
 
@@ -120,7 +120,7 @@ class Lobby:
         """
         # Set Ready
 
-        Change ready state of client
+        Change ready state of client.
 
         ## Parameters
 
@@ -215,12 +215,12 @@ class Lobby:
         """
         # Kick Player
 
-        Kick a player from the custom match.
+        Kick the requested player from the custom match.
 
         ## Parameters
 
         :hardware_name: (str) The platform of the player, i.e PC-STEAM.
-        :user_hash: (str) The hash of the player.
+        :user_hash: (str) The hash of the player. Obtained via LiveApex.Lobby.getPlayers().
 
         ## Example
 
@@ -240,7 +240,7 @@ class Lobby:
         """
         # Get Custom Match Settings
 
-        Gets current custom match settings.
+        Get current custom match settings.
 
         ## Example
 
@@ -289,16 +289,17 @@ class Lobby:
         """
         # Set Legend Ban
 
-        Sets legend bans for the lobby. To reset the bans, run this function with an empty list.
+        Set legend bans for the lobby.
 
         ## Parameters
 
-        :bans: (list[str]) A list of legend names to ban, all list items must be str.
+        :bans: (list[str]) A list of legend names to ban, all list items must be str. Or an empty list to reset bans.
 
         ## Example
 
         ```python
-        await LiveApex.Lobby.setLegendBan(['wraith', 'madmaggie'])
+        await LiveApex.Lobby.setLegendBan(['wraith', 'madmaggie']) # bans wraith and mad maggie
+        await LiveApex.Lobby.setLegendBan([]) # resets bans
         ```
         """
 
@@ -321,7 +322,7 @@ class Lobby:
         """
         # Get Legend Bans
 
-        Get a list of current legend bans.
+        Get list of current legend bans.
 
         ## Example
 
@@ -361,7 +362,7 @@ class Lobby:
         """
         # Set Drop Location
 
-        This function sets the drop location of a team.
+        Define a drop location of a specified team.
 
         ## Parameters
 
