@@ -1,7 +1,5 @@
 import asyncio
 import websockets
-import os
-import site
 import traceback
 import json
 import importlib
@@ -34,65 +32,30 @@ class Core:
         ```
         """
 
-        # Get server.py path
-        server_path = os.path.join(site.getsitepackages()[0], "Lib", "site-packages", "LiveApex", "server.py")
-
-        # start server.py subprocess
-        process = await asyncio.create_subprocess_exec(
-            "python", server_path,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-
-        print(r"""
- _     _              _
-| |   (_)_   _____   / \   _ __   _____  __
-| |   | \ \ / / _ \ / _ \ | '_ \ / _ \ \/ /
-| |___| |\ V /  __// ___ \| |_) |  __/>  <
-|_____|_| \_/ \___/_/   \_\ .__/ \___/_/\_\
-                          |_|
-===========================================
-Version 1.2.0 // 1/07/2025
-        """)
-        print("[LiveApexCore] Starting WebSocket Server")
-
-        # Read the output and error streams
-        async def read_stream(stream, callback):
-            while True:
-                line = await stream.readline()
-                if not line:
-                    break
-                callback(line.decode().strip())
-
-        # Define output and error streams
-        if debug == False:
-            stdout_task = asyncio.create_task(read_stream(process.stdout, lambda x: print(f"[LiveApexSocket] {x}")))
-            stderr_task = asyncio.create_task(read_stream(process.stderr, lambda x: print(f"[LiveApexSocket] [ERROR] {x}")))
-
-        elif debug == True:
-            stdout_task = asyncio.create_task(read_stream(process.stdout, lambda x: print(f"[LiveApexSocket] {x}\n===\nError Log\n{traceback.format_exc()}\n===")))
-            stderr_task = asyncio.create_task(read_stream(process.stderr, lambda x: print(f"[LiveApexSocket] [ERROR] {x}\n===\nError Log\n{traceback.format_exc()}\n===")))
-
-        # Keep socket process running
-        await process.wait()
-
-        # Close streams after socket ends
-        stdout_task.cancel()
-        stderr_task.cancel()
-
-        # Catch any exceptions that happen when tasks end
-        try:
-            try:
-                await stdout_task
-                await stderr_task
-            except asyncio.CancelledError as e:
-                if debug == False: print(f"[LiveApexCore] Error: {e}")
-                elif debug == True: print(f"[LiveApexCore] Error: {e}\n===\nError Log\n{traceback.format_exc()}\n===")
-                pass
+        # Import LiveApex.server
+        try: websocket_server = importlib.import_module("LiveApex.server")
+    
         except Exception as e:
-            if debug == False: print(f"[LiveApexCore] Error: {e}")
-            elif debug == True: print(f"[LiveApexCore] Error: {e}\n===\nError Log\n{traceback.format_exc()}\n===")
-            pass
+            if debug: print(f"[LiveApexCore] Failed to import server module: {e}\n===\nError Log\n{traceback.format_exc()}\n===")
+            else: print(f"[LiveApexCore] Failed to import server module: {e}")
+            return
+
+        # Start websocket as a background task
+        try: server_task = asyncio.create_task(websocket_server.main())
+
+        except Exception as e:
+            if debug: print(f"[LiveApexCore] Failed to start server: {e}\n===\nError Log\n{traceback.format_exc()}\n===")
+            else: print(f"[LiveApexCore] Failed to start server: {e}")
+            return
+
+        # Await for any exceptions
+        try:
+            await server_task
+
+        except Exception as e:
+            if debug: print(f"[LiveApexCore] Error: {e}\n===\nError Log\n{traceback.format_exc()}\n===")
+            else: print(f"[LiveApexCore] Error: {e}")
+            return
 
         print("[LiveApexCore] WebSocket Server Task Ended")
 
