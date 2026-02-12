@@ -24,7 +24,7 @@ The LiveAPI is only avaliable in custom games, this will not work for public or 
 Some functions will only work in lobby codes provided by EA/Respawn.
 
 ## Versioning
-LiveApex version is v2.0.0. LiveAPI version is v2.4 (Season 28: Breach | Split 1)
+LiveApex version is v2.0.0-WIP. LiveAPI version is v2.4 (Season 28: Breach | Split 1)
 
 ## Disclaimer
 I am not responsible for any missuse of the Apex Legends LiveAPI, use this library responsibly, at your own risk.
