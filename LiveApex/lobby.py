@@ -11,6 +11,28 @@ class Lobby:
     This class contains functions to alter or get data on the lobby and it's players.
     """
 
+    async def joinPartyServer():
+        """
+        # Join Party Server
+
+        Proceeds game client to the lobby screen from the title screen.
+
+        ## Notes
+        This is a super powerful function that allows full automation when it comes to setting up custom matches.
+        However, using any follow up commands, such as creating a lobby wont work until the game client has fully loaded into the lobby screen.
+        Allow 10-20 seconds after using this command before sending any other lobby related commands.
+        See an example of an automated lobby setup script at https://github.com/CatotronExists/LiveApex/tree/main/examples
+
+        ## Example
+
+        ```python
+        await LiveApex.Lobby.joinPartyServer()
+        ```
+        """
+
+        async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
+            await websocket.send(json.dumps({"joinPartyServer": {}}))
+
     async def sendChatMessage(text):
         """
         # Send a Chat Message
