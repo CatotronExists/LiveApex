@@ -142,7 +142,7 @@ class Lobby:
         """
         # Set Ready
 
-        Change ready state of client.
+        Change ready state of client, to start/stop matchmaking.
 
         ## Parameters
 
@@ -166,7 +166,7 @@ class Lobby:
         """
         # Set Team Name
 
-        Sets the name of a requested team.
+        Sets name of the requested team.
 
         ## Parameters
 
@@ -209,7 +209,7 @@ class Lobby:
 
     async def movePlayer(team_id, hardware_name, user_hash):
         """
-        # Set Team
+        # Move Player
 
         Move a player to a different team.
 
@@ -309,7 +309,7 @@ class Lobby:
 
     async def setLegendBan(bans):
         """
-        # Set Legend Ban
+        # Set Legend Bans
 
         Set legend bans for the lobby.
 
