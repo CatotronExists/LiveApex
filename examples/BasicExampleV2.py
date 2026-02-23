@@ -1,4 +1,4 @@
-# This is a basic example of how to structure your code to use the LiveApex API.
+# This is a basic example of how to structure your code to use the LiveApex API. #
 
 import LiveApex
 import asyncio
