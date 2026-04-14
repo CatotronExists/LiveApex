@@ -142,3 +142,23 @@ class Core:
 
         except: # If the event is a sent command to the websocket and not a LiveAPIEvent, ignore it
             return None
+    
+    async def sendWebSocketCommand(command: dict):
+        """
+        # Send a command to the WebSocket server
+
+        Used to send commands to the WebSocket server.
+
+        ## Parameters
+
+        :command: (dict) A dict containing the command to send and any data required. The format is as follows: {"commandName": {data}}
+
+        ## Example
+
+        ```python
+        await LiveApex.Core.sendWebSocketCommand({customMatch_SendChat: {"text": "LiveApex"}})
+        ```
+        """
+
+        async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
+            await websocket.send(json.dumps(command))
