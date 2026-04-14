@@ -1,23 +1,22 @@
 ### LiveApex Translator Functions ###
 # These functions convert internal to common names or vice versa #
 
-## Internal to Common Names
-map_translations = {
-    "mp_rr_canyonlands_hu": "Kings Canyon",
-    "mp_rr_tropic_island_mu1": "Storm Point (Season 13)",
-    "mp_rr_tropic_island_mu1_storm": "Storm Point (Season 18)",
-    "mp_rr_tropic_island_mu2": "Storm Point (Season 21)",
-    "mp_rr_tropic_island_mu2_landscape": "Storm Point", # Season 25 optimization
-    "mp_rr_desertlands_mu3": "Worlds Edge (Season 10)",
-    "mp_rr_desertlands_mu4": "Worlds Edge (Season 16)",
-    "mp_rr_desertlands_hu": "Worlds Edge",
-    "mp_rr_olympus_mu2": "Olympus",
-    "mp_rr_divided_moon": "Broken Moon (Season 15)",
-    "mp_rr_divided_moon_mu1": "Broken Moon",
-    "mp_rr_district": "E-District",
+maps = {
+    # BR Maps (Trios, Duos & Ranked)
+    "mp_rr_canyonlands_hu_breach": "Kings Canyon",      # Season 28 Hardlight Addition
+    "mp_rr_tropic_island_mu2_landscape": "Storm Point", # Season 25 Optimization
+    "mp_rr_desertlands_hu_breach": "World's Edge",      # Season 28 Hardlight Addition
+    "mp_rr_olympus_mu3": "Olympus",                     # Season 27 Map Update
+    "mp_rr_divided_moon_mu1_breach": "Broken Moon",     # Season 28 Hardlight Addition
+    "mp_rr_district_mu1_breach": "E-District",          # Season 28 Hardlight Addition
+    # Wildcard Maps
+    "mp_rr_canyonlands_hu_avt": "Kings Canyon (Wildcard)",
+    # Mixtape Exclusive Maps
+    "mp_rr_freedm_skulltown": "Skull Town"
+    # Others (LTMs, etc.)
 }
 
-datacenter_translations = {
+datacenters = {
     "ap-east-1": "Hong Kong",
     "ap-northeast-1": "Tokyo",
     "ap-southeast-1": "Singapore",
@@ -31,7 +30,7 @@ datacenter_translations = {
 }
 
 ### MISSING MELEE HEIRLOOM VARIANTS
-weapon_translations = {
+weapons = {
     # GRENADES
     "mp_weapon_grenade_emp": "Arc Star",
     "mp_weapon_thermite_grenade": "Thermite Grenade",
@@ -67,7 +66,7 @@ weapon_translations = {
     "mp_weapon_doubletake": "Triple Take",
     # SHOTGUN WEAPONS
     "mp_weapon_energy_shotgun": "Peacekeeper",
-    "mp_weapon_shotgun_pistol": "Mozambique Shotgun",
+    "mp_weapon_shotgun_pistol": "Mozambique",
     "mp_weapon_shotgun": "EVA-8",
     "mp_weapon_mastiff": "Mastiff",
     # CARE PACKAGE WEAPONS
@@ -166,41 +165,45 @@ class Translator:
 
     def translateDatacenter(datacenter: str):
         """
-        # Translate a datacenter
+        # Translate Datacenter
 
-        This function translates a datacenter from internal reference to a common name.
+        Translates datacenter from internal reference to a common name or vice versa.
 
         ## Parameters
 
-        :datacenter: The datacenter to translate.
+        :datacenter: The datacenter to translate. Either an internal or common name.
 
         ## Example
 
         ```python
-        LiveApex.Translator.translateDatacenter('')
+        LiveApex.Translator.translateDatacenter('Sydney')
         ```
 
         ## Raises
 
-        Exception: {datacenter} | If the datacenter is unknown.
+        Exception: {datacenter} | If the datacenter parameter has no translations.
         """
 
-        if datacenter in datacenter_translations:
-            translated = datacenter_translations[datacenter]
+        datacenter_lower = datacenter.lower()
+        datacenters_lower = {k.lower(): v for k, v in datacenters.items()}
+        datacenters_values_lower = {v.lower(): k for k, v in datacenters.items()}
+        
+        if datacenter_lower in datacenters_lower:
+            return datacenters_lower[datacenter_lower]
+        elif datacenter_lower in datacenters_values_lower:
+            return datacenters_values_lower[datacenter_lower]
         else:
             raise Exception(f"Unknown datacenter: {datacenter}")
 
-        return translated
-
     def translateWeapon(weapon: str):
         """
-        # Translate a Weapon
+        # Translate Weapon
 
-        This function translates a weapon from internal reference to a common name.
+        Translates weapon name from internal reference to a common name or vice versa.
 
         ## Parameters
 
-        :weapon: The weapon to translate.
+        :weapon: The weapon to translate. Either an internal or common name.
 
         ## Example
 
@@ -210,123 +213,98 @@ class Translator:
 
         ## Raises
 
-        Exception: {weapon} | If the weapon is unknown.
+        Exception: {weapon} | If the weapon parameter has no translations.
         """
 
-        if weapon in weapon_translations:
-            translated = weapon_translations[weapon]
+        weapon_lower = weapon.lower()
+        weapons_lower = {k.lower(): v for k, v in weapons.items()}
+        weapons_values_lower = {v.lower(): k for k, v in weapons.items()}
+        
+        if weapon_lower in weapons_lower:
+            return weapons_lower[weapon_lower]
+        elif weapon_lower in weapons_values_lower:
+            return weapons_values_lower[weapon_lower]
         else:
             raise Exception(f"Unknown weapon: {weapon}")
-
-        return translated
 
     def translateMap(map: str):
         """
-        # Translate a Map
+        # Translate Map
 
-        This function translates a map from internal reference to a common name.
+        Translates map from internal reference to a common name or vice versa.
 
         ## Parameters
 
-        :map: The map to translate.
+        :map: The map to translate. Either an internal or common name.
 
         ## Example
 
         ```python
-        LiveApex.Translator.translateMap('mp_rr_tropic_island_mu2')
+        LiveApex.Translator.translateMap('mp_rr_tropic_island_mu2_landscape')
         ```
 
         ## Raises
 
-        Exception: {map} | If the map is unknown.
+        Exception: {map} | If the map parameter has no translations.
         """
 
-        if map in map_translations:
-            translated = map_translations[map]
+        map_lower = map.lower()
+        maps_lower = {k.lower(): v for k, v in maps.items()}
+        maps_values_lower = {v.lower(): k for k, v in maps.items()}
+        
+        if map_lower in maps_lower:
+            return maps_lower[map_lower]
+        elif map_lower in maps_values_lower:
+            return maps_values_lower[map_lower]
         else:
             raise Exception(f"Unknown map: {map}")
-
-        return translated
-
-    def untranslateDatacenter(datacenter: str):
+        
+    def translatePlaylist(playlist: str, mode = None):
         """
-        # Untranslate a datacenter
+        # Translate Playlist
 
-        This function untranslates a datacenter from common name to internal reference.
+        Translates playlist from internal reference to a common name or vice versa.
 
         ## Parameters
 
-        :datacenter: The datacenter to untranslate.
+        :playlist: The map/playlist to translate. Either an internal playlist name or common map name.
+        :mode: The gamemode of the playlist (required for translation to internal playlist name).
 
         ## Example
 
         ```python
-        LiveApex.Translator.untranslateDatacenter('')
+        LiveApex.Translator.translatePlaylist('kings canyon', 'algs')
         ```
+
+        ## Returns
+        If translating from internal to common names, {map_name}:{mode_name}
+        If translating from common to internal names, {internal_playlist_name}
 
         ## Raises
 
-        Exception: {datacenter} | If the datacenter is unknown.
+        Exception: {playlist} | If the playlist parameter has no translations.
         """
 
-        if datacenter in datacenter_untranslations:
-            translated = datacenter_untranslations[datacenter]
+        if mode != None:
+            playlist_key = f"{playlist}:{mode}".lower()
+            playlists_lower = {k.lower(): v for k, v in playlists.items()}
+            playlists_values_lower = {v.lower(): k for k, v in playlists.items()}
+            
+            if playlist_key in playlists_lower:
+                return playlists_lower[playlist_key]
+            elif playlist_key in playlists_values_lower:
+                return playlists_values_lower[playlist_key]
+            else:                
+                raise Exception(f"Unknown playlist: {playlist}:{mode}")
+
         else:
-            raise Exception(f"Unknown datacenter: {datacenter}")
-
-        return translated
-
-    def untranslateWeapon(weapon: str):
-        """
-        # Untranslate a Weapon
-
-        This function untranslates a weapon from common name to internal reference.
-
-        ## Parameters
-
-        :weapon: The weapon to untranslate.
-
-        ## Example
-
-        ```python
-        LiveApex.Translator.untranslateWeapon('Mastiff')
-        ```
-
-        ## Raises
-
-        Exception: {weapon} | If the weapon is unknown.
-        """
-
-        if weapon in weapon_untranslations:
-            translated = weapon_untranslations[weapon]
-        else:
-            raise Exception(f"Unknown weapon: {weapon}")
-
-        return translated
-
-    def untranslateMap(map: str):
-        """
-        # Untranslate a Map
-
-        This function untranslates a map from common name to internal reference.
-
-        ## Parameters
-
-        :map: The map to untranslate.
-
-        ## Example
-
-        ```python
-        LiveApex.Translator.untranslateMap('Kings Canyon')
-        ```
-
-        ## Raises
-        Exception: {map} | If the map is unknown.
-        """
-
-        if map in map_untranslations:
-            translated = map_untranslations[map]
-        else:
-            raise Exception(f"Unknown map: {map}")
-
-        return translated
+            playlist_lower = playlist.lower()
+            playlists_lower = {k.lower(): v for k, v in playlists.items()}
+            playlists_values_lower = {v.lower(): k for k, v in playlists.items()}
+            
+            if playlist_lower in playlists_lower:
+                return playlists_lower[playlist_lower]
+            elif playlist_lower in playlists_values_lower:
+                return playlists_values_lower[playlist_lower]
+            else:
+                raise Exception(f"Unknown playlist: {playlist}")
