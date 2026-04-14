@@ -1,5 +1,4 @@
-import websockets
-import json
+from .core import Core
 
 ### LiveApex Lobby Functions ###
 # These functions are used to interact with the lobby and players in the custom match #
@@ -30,8 +29,7 @@ class Lobby:
         ```
         """
 
-        async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
-            await websocket.send(json.dumps({"joinPartyServer": {}}))
+        Core.sendWebSocketCommand({"joinPartyServer": {}})
 
     async def sendChatMessage(text):
         """
@@ -55,8 +53,7 @@ class Lobby:
         ```
         """
 
-        async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
-            await websocket.send(json.dumps({"customMatch_SendChat": {"text": str(text)}}))
+        Core.sendWebSocketCommand({"customMatch_SendChat": {"text": str(text)}})
 
     async def togglePause(countdown):
         """
@@ -76,9 +73,7 @@ class Lobby:
         """
 
         if isinstance(countdown, int):
-            async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
-                await websocket.send(json.dumps({"customMatch_TogglePause": {"preTimer": str(countdown)}}))
-
+            Core.sendWebSocketCommand({"customMatch_TogglePause": {"preTimer": str(countdown)}})
         else:
             raise ValueError(f"[customMatch_TogglePause] countdown expects int value")
 
@@ -95,8 +90,7 @@ class Lobby:
         ```
         """
 
-        async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
-            await websocket.send(json.dumps({"customMatch_CreateLobby": {}}))
+        Core.sendWebSocketCommand({"customMatch_CreateLobby": {}})
 
     async def joinLobby(lobby_code):
         """
@@ -116,9 +110,7 @@ class Lobby:
         """
 
         if isinstance(lobby_code, str):
-            async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
-                await websocket.send(json.dumps({"customMatch_JoinLobby": {"roleToken": lobby_code}}))
-
+            Core.sendWebSocketCommand({"customMatch_JoinLobby": {"roleToken": lobby_code}})
         else:
             raise ValueError(f"[customMatch_JoinLobby] lobby_code expects str value")
 
@@ -135,8 +127,7 @@ class Lobby:
         ```
         """
 
-        async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
-            await websocket.send(json.dumps({"customMatch_LeaveLobby": {}}))
+        Core.sendWebSocketCommand({"customMatch_LeaveLobby": {}})
 
     async def setReady(ready):
         """
@@ -156,9 +147,7 @@ class Lobby:
         """
 
         if isinstance(ready, bool):
-            async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
-                await websocket.send(json.dumps({"customMatch_SetReady": {"isReady": ready}}))
-
+            Core.sendWebSocketCommand({"customMatch_SetReady": {"isReady": ready}})
         else:
             raise ValueError(f"[customMatch_SetReady] ready expects bool value")
 
@@ -185,9 +174,7 @@ class Lobby:
         """
 
         if isinstance(team_id, int) and isinstance(team_name, str):
-            async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
-                await websocket.send(json.dumps({"customMatch_SetTeamName": {"teamId": team_id, "teamName": team_name}}))
-
+            Core.sendWebSocketCommand({"customMatch_SetTeamName": {"teamId": team_id, "teamName": team_name}})
         else:
             raise ValueError(f"[customMatch_SetTeamName] One or more of the following values are invaild:\n   [customMatch_SetTeamName] team_id expects int value\n   [customMatch_SetTeamName] team_name expects str value")
 
@@ -204,8 +191,7 @@ class Lobby:
         ```
         """
 
-        async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
-            await websocket.send(json.dumps({"customMatch_GetLobbyPlayers": {}}))
+        Core.sendWebSocketCommand({"customMatch_GetLobbyPlayers": {}})
 
     async def movePlayer(team_id, hardware_name, user_hash):
         """
@@ -227,9 +213,7 @@ class Lobby:
         """
 
         if isinstance(team_id, int) and isinstance(hardware_name, str) and isinstance(user_hash, str):
-            async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
-                await websocket.send(json.dumps({"customMatch_SetTeam": {"teamId": team_id, "targetHardwareName": hardware_name, "targetNucleusHash": user_hash}}))
-
+            Core.sendWebSocketCommand({"customMatch_SetTeam": {"teamId": team_id, "targetHardwareName": hardware_name, "targetNucleusHash": user_hash}})
         else:
             raise ValueError(f"[customMatch_SetTeam] One or more of the following values are invaild:\n   [customMatch_SetTeam] team_id expects int value\n   [customMatch_SetTeam] hardware_name expects str value\n   [customMatch_SetTeam] user_hash expects str value")
 
@@ -252,9 +236,7 @@ class Lobby:
         """
 
         if isinstance(hardware_name, str) and isinstance(user_hash, str):
-            async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
-                await websocket.send(json.dumps({"customMatch_KickPlayer": {"targetHardwareName": hardware_name, "targetNucleusHash": user_hash}}))
-
+            Core.sendWebSocketCommand({"customMatch_KickPlayer": {"targetHardwareName": hardware_name, "targetNucleusHash": user_hash}})
         else:
             raise ValueError(f"[customMatch_KickPlayer] One or more of the following values are invaild:\n   [customMatch_KickPlayer] hardware_name expects str value\n   [customMatch_KickPlayer] user_hash expects str value")
 
@@ -271,8 +253,7 @@ class Lobby:
         ```
         """
 
-        async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
-            await websocket.send(json.dumps({"customMatch_GetSettings": {}}))
+        Core.sendWebSocketCommand({"customMatch_GetSettings": {}})
 
     async def setSettings(playlist_name, admin_chat, team_rename, self_assign, aim_assist, anon_mode):
         """
@@ -301,9 +282,7 @@ class Lobby:
         """
 
         if isinstance(playlist_name, str) and isinstance(admin_chat, bool) and isinstance(team_rename, bool) and isinstance(self_assign, bool) and isinstance(aim_assist, bool) and isinstance(anon_mode, bool):
-            async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
-                await websocket.send(json.dumps({"customMatch_SetSettings": {"playlistName": playlist_name, "adminChat": admin_chat, "teamRename": team_rename, "selfAssign": self_assign, "aimAssist": aim_assist, "anonMode": anon_mode}}))
-
+            Core.sendWebSocketCommand({"customMatch_SetSettings": {"playlistName": playlist_name, "adminChat": admin_chat, "teamRename": team_rename, "selfAssign": self_assign, "aimAssist": aim_assist, "anonMode": anon_mode}})
         else:
             raise ValueError(f"[customMatch_SetSettings] One or more of the following values are invaild:\n   [customMatch_SetSettings] playlist_name expects str value\n   [customMatch_SetSettings] admin_chat expects bool value\n   [customMatch_SetSettings] team_rename expects bool value\n   [customMatch_SetSettings] self_assign expects bool value\n   [customMatch_SetSettings] aim_assist expects bool value\n   [customMatch_SetSettings] anon_mode expects bool value")
 
@@ -332,11 +311,9 @@ class Lobby:
                 else: scan +=1
 
             if scan == 0: # If all items are str -> send to websocket
-                async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
-                    await websocket.send(json.dumps({"customMatch_SetLegendBan": {"legendRefs": ''.join(bans)}}))
+                Core.sendWebSocketCommand({"customMatch_SetLegendBan": {"legendRefs": ''.join(bans)}})
             else:
                 raise ValueError(f"[customMatch_SetLegendBan] bans expects all list values to be str")
-
         else:
             raise ValueError(f"[customMatch_SetLegendBan] bans expects list value")
 
@@ -353,8 +330,7 @@ class Lobby:
         ```
         """
 
-        async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
-            await websocket.send(json.dumps({"customMatch_GetLegendBanStatus": {}}))
+        Core.sendWebSocketCommand({"customMatch_GetLegendBanStatus": {}})
 
     async def startGame(status):
         """
@@ -374,9 +350,7 @@ class Lobby:
         """
 
         if isinstance(status, bool):
-            async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
-                await websocket.send(json.dumps({"customMatch_SetMatchmaking": {"enabled": status}}))
-
+            Core.sendWebSocketCommand({"customMatch_SetMatchmaking": {"enabled": status}})
         else:
             raise ValueError(f"[customMatch_SetMatchmaking] status expects bool value")
 
@@ -399,105 +373,6 @@ class Lobby:
         """
 
         if isinstance(team_id, int) and isinstance(drop_location, int):
-            async with websockets.connect(uri="ws://127.0.0.1:7777", ping_interval=20, ping_timeout=20) as websocket:
-                await websocket.send(json.dumps({"customMatch_SetSpawnPoint": {"teamId": team_id, "spawnPoint": drop_location}}))
-
+            Core.sendWebSocketCommand({"customMatch_SetSpawnPoint": {"teamId": team_id, "spawnPoint": drop_location}})
         else:
             raise ValueError(f"[customMatch_SetSpawnPoint] One or more of the following values are invaild:\n   [customMatch_SetSpawnPoint] team_id expects int value\n   [customMatch_SetSpawnPoint] drop_location expects int value")
-
-    ### TEMP DISABLED
-    # async def setEndRingExclusions(map_region):
-    #     """
-    #     # Set End Ring Exclusions
-
-    #     This function sets the end ring exclusions for the lobby. Run this function multiple times if you want to exclude multiple regions.
-
-    #     ## Parameters
-
-    #     :map_region: (str) The map region to exclude. TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT, CENTER or use REGIONS_COUNT to reset
-
-    #     ## Example
-
-    #     ```python
-    #     await LiveApex.Lobby.setEndRingExclusions('TOP_LEFT')
-    #     ```
-    #     """
-
-    #     uri = 'ws://127.0.0.1:7777'
-    #     async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
-    #         # Construct the Request message
-    #         request = events_pb2.Request()
-    #         if map_region == "TOP_LEFT":
-    #             request.customMatch_SetEndRingExclusion.selectionToExclude = events_pb2.MapRegion.TOP_LEFT
-    #         elif map_region == "TOP_RIGHT":
-    #             request.customMatch_SetEndRingExclusion.selectionToExclude = events_pb2.MapRegion.TOP_RIGHT
-    #         elif map_region == "BOTTOM_LEFT":
-    #             request.customMatch_SetEndRingExclusion.selectionToExclude = events_pb2.MapRegion.BOTTOM_LEFT
-    #         elif map_region == "BOTTOM_RIGHT":
-    #             request.customMatch_SetEndRingExclusion.selectionToExclude = events_pb2.MapRegion.BOTTOM_RIGHT
-    #         elif map_region == "CENTER":
-    #             request.customMatch_SetEndRingExclusion.selectionToExclude = events_pb2.MapRegion.CENTER
-    #         elif map_region == "REGIONS_COUNT":
-    #             request.customMatch_SetEndRingExclusion.selectionToExclude = events_pb2.MapRegion.REGIONS_COUNT
-    #         else:
-    #             raise ValueError("[LiveApexLobby] Invalid map region. Must be one of: TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT, CENTER or REGIONS_COUNT.")
-
-    #         # Serialize the Request message
-    #         serialized_request = request.SerializeToString()
-
-    #         # Send the message
-    #         await websocket.send(serialized_request)
-
-    # async def changeCamera(selection, input):
-    #     """
-    #     # Change Camera
-
-    #     This function changes the camera of the observer.
-
-    #     ## Parameters
-
-    #     :selection: (str) Player name, nucleusHash or use one of the following poi options: NEXT, PREVIOUS, KILL_LEADER, CLOSEST_ENEMY, CLOSEST_PLAYER, LATEST_ATTACKER.
-    #     :input: (str) poi ["NEXT", "PREVIOUS", "KILL_LEADER", "CLOSEST_ENEMY", "CLOSEST_PLAYER", "LATEST_ATTACKER"], player or hash.
-
-    #     ## Example
-
-    #     ```python
-    #     await LiveApex.Lobby.changeCamera('KILL_LEADER')
-    #     ```
-    #     """
-
-    #     uri = 'ws://127.0.0.1:7777'
-
-    #     async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
-    #         # Construct the Request message
-    #         request = events_pb2.Request()
-    #         if input == "poi":
-    #             if selection in ["NEXT", "PREVIOUS", "KILL_LEADER", "CLOSEST_ENEMY", "CLOSEST_PLAYER", "LATEST_ATTACKER"]:
-    #                 if selection == "NEXT":
-    #                     request.changeCamera.poi = events_pb2.PlayerOfInterest.NEXT
-    #                 elif selection == "PREVIOUS":
-    #                     request.changeCamera.poi = events_pb2.PlayerOfInterest.PREVIOUS
-    #                 elif selection == "KILL_LEADER":
-    #                     request.changeCamera.poi = events_pb2.PlayerOfInterest.KILL_LEADER
-    #                 elif selection == "CLOSEST_ENEMY":
-    #                     request.changeCamera.poi = events_pb2.PlayerOfInterest.CLOSEST_ENEMY
-    #                 elif selection == "CLOSEST_PLAYER":
-    #                     request.changeCamera.poi = events_pb2.PlayerOfInterest.CLOSEST_PLAYER
-    #                 elif selection == "LATEST_ATTACKER":
-    #                     request.changeCamera.poi = events_pb2.PlayerOfInterest.LATEST_ATTACKER
-
-    #         elif input == "player":
-    #             request.changeCamera.name = selection
-
-    #         elif input == "hash":
-    #             request.changeCamera.nucleusHash = selection
-
-    #         # Construct the Request message
-    #         request = events_pb2.Request()
-    #         request.changeCamera.CopyFrom(events_pb2.ChangeCamera(target=selection))
-
-    #         # Serialize the Request message
-    #         serialized_request = request.SerializeToString()
-
-    #         # Send the message
-    #         await websocket.send(serialized_request)
